@@ -28,7 +28,7 @@ const presets={
  h114:{profile:'H114-1.0',nominalT:1,coverWidth:600,steelT:1,thicknessMode:'nominal',thicknessBasis:'steel',basis:'catalogue',precision:'high',accountTolerance:false,grade:'250',limitSource:'document'}
 };
 const presetNotes={blank:'Выберите профиль и задайте пролёт. По умолчанию: геометрический сбор нагрузок, плита 200 мм.',corrected_down:'Н75, два пролёта, широкая полка вниз. СП 266, плита 200 мм, собственный вес и запруживание.',corrected_up:'Н75, два пролёта, широкая полка вверх. СП 266, плита 200 мм, собственный вес и запруживание.',word_down:'Н75, один пролёт, широкая полка вниз. Плита 200 мм.',word_up:'Н75, один пролёт, широкая полка вверх. Плита 200 мм.',snip3_up:'СНиП 3.03.01-87: опалубка, три пролёта, широкая вверх. Плита 200 мм, монтажная нагрузка 2,5 кПа.',snip3_down:'СНиП 3.03.01-87: опалубка, три пролёта, широкая вниз. Плита 200 мм, монтажная нагрузка 2,5 кПа.',h114:'Н114-600-1,0, плита 200 мм. Местные проверки требуют характеристик опор.'};
-function applyPreset(key){regimeStates={};activeRegime=null;$('preset').value=key;$('presetNote').textContent=presetNotes[key];setState({...presetBase,...presets[key]});if(key==='blank'){for(let id of ['L','nominalT','steelT'])$(id).value='';render();}}
+function applyPreset(key){thicknessBeforeCatalogue=null;regimeStates={};activeRegime=null;$('preset').value=key;$('presetNote').textContent=presetNotes[key];setState({...presetBase,...presets[key]});if(key==='blank'){for(let id of ['L','nominalT','steelT'])$(id).value='';render();}}
 function syncAutomatic(s){
  const a=D.normalizeSettings(s);
  for(const k of Object.keys(D.defaults))if($(k)&&a[k]!==s[k]){if(boolkeys.includes(k))$(k).checked=!!a[k];else $(k).value=k==='L'?a[k]*1000:scaledKeys.includes(k)&&uiUnits==='tf'?a[k]/D.G:a[k];}
@@ -49,7 +49,7 @@ function updateFields(s){
  const snip=s.designCode==='snip',auto=s.limitSource==='document';
  $('snipPurposeField').classList.toggle('hide',!snip);$('snipRebarField').classList.toggle('hide',!snip||s.snipPurpose!=='formwork');
  $('deflection').disabled=snip||auto;$('defLimitMode').disabled=auto;$('limit').disabled=auto;$('absoluteLimit').disabled=auto;
- for(const k of ['VR','Rend','Rinner','flanges','stiffener','precision'])$(k).disabled=snip;for(const k of ['nominalT','thicknessBasis'])$(k).disabled=false;document.querySelector('#thicknessMode option[value="direct"]').disabled=!snip&&s.basis!=='manual'&&['normal','increased'].includes(s.precision);$('pond').disabled=snip;$('grade').disabled=snip;$('thicknessMode').disabled=snip;
+ for(const k of ['VR','Rend','Rinner','flanges','stiffener','precision'])$(k).disabled=snip;for(const k of ['nominalT','thicknessBasis'])$(k).disabled=s.basis==='catalogue';document.querySelector('#thicknessMode option[value="direct"]').disabled=!snip&&s.basis==='geometry'&&['normal','increased'].includes(s.precision);$('pond').disabled=snip;$('grade').disabled=snip;$('thicknessMode').disabled=snip||s.basis==='catalogue';document.querySelector('#thicknessMode option[value=direct]').textContent=s.basis==='catalogue'?'Толщина выбранной строки ГОСТ':'Прямой ввод готовой t';
  document.querySelector('#basis option[value="geometry"]').disabled=snip||!s.profile.startsWith('H75');document.querySelector('#massMode option[value="catalogue"]').disabled=s.profile==='custom';
  document.querySelector('#loadMode option[value="construction"]').disabled=snip&&s.snipPurpose==='deck';
  $('pumpLoad').disabled=snip;$('bucketLoad').disabled=snip;
@@ -59,12 +59,12 @@ function updateFields(s){
  $('deckMass').disabled=!s.own||s.massMode!=='manual';$('steelT').disabled=s.thicknessMode!=='direct'||s.basis==='catalogue';$('tolerance').disabled=s.precision!=='manual';$('Ry').disabled=s.grade!=='manual';$('accountTolerance').disabled=snip||s.thicknessMode==='direct'||s.thicknessMode==='nominal'&&['normal','increased'].includes(s.precision);
  document.querySelectorAll('[name=orientationChoice],[name=orientationFigureChoice]').forEach(el=>el.checked=el.value===s.orientation);$('orientationLabel').textContent=D.catalogue[s.profile]?.equal?'Полка у оси 1–1 по ГОСТ':'Широкая полка';$('figureOrientationLabel').textContent=$('orientationLabel').textContent;
  $('blankWidthField').classList.toggle('hide',!(s.massMode==='blank'&&s.own&&s.loadMode==='construction'||!snip&&s.thicknessMode==='nominal'&&s.accountTolerance&&s.precision!=='manual'));
- $('basisHint').textContent=s.basis==='catalogue'?'Характеристики ГОСТ · '+(D.catalogue[s.profile]?.name||'профиль не выбран')+'.':s.basis==='geometry'?'Геометрический расчёт выбранного профиля Н75.':'Ручные W, I и предельные силы.';
+ $('basisHint').textContent=s.basis==='catalogue'?'Характеристики ГОСТ · '+(D.catalogue[s.profile]?.name||'профиль не выбран')+'. Номинальное табличное сечение; для уменьшенной толщины нужен другой источник W/I.':s.basis==='geometry'?'Геометрический расчёт выбранного профиля Н75.':'Ручные W, I и предельные силы.';
  $('massHint').textContent=s.massMode==='catalogue'?'Масса по строке ГОСТ; в ней учтён цинк 414 г/м².':s.massMode==='manual'?'Введите массу настила в поле ниже.':'Выбрано: '+'масса по основе, заготовке и выбранному покрытию.';
  $('autoInfo').textContent=[!snip&&s.thicknessMode==='nominal'&&['normal','increased'].includes(s.precision)?'Минусовой допуск включён автоматически.':'',s.massMode==='blank'?'Масса — по заготовке и выбранному цинку.':''].filter(Boolean).join(' ');
  for(const [k,label] of Object.entries({mount:'Монтажная нагрузка qм',concreteInput:'qбет',manualD:'Расчётная qd',manualN:'Нормативная qn',VR:'VR',Rend:'RR край',Rinner:'RR центр'})){$(k).closest('label').querySelector('span').textContent=label+', '+(['VR','Rend','Rinner'].includes(k)?unit().r:unit().q);$(k).step=uiUnits==='tf'?'.001':'.01';}
  try{let a=D.prepareProject(s),h=a.th;if(auto){$('limit').value=a.s.limit;$('defLimitMode').value=a.s.defLimitMode;}if(snip||auto)$('deflection').value=a.s.deflection;if(snip)$('pond').checked=false;if(s.thicknessMode!=='direct')$('steelT').value=Number(h.t.toFixed(6));if(s.precision!=='manual')$('tolerance').value=h.delta;if(s.grade!=='manual')$('Ry').value=a.s.Ry;if(s.massMode!=='manual')$('deckMass').value=Number(a.mass.toFixed(5));
- $('thicknessInfo').innerHTML=`tосновы = <b>${fmt(h.core,4)}</b> мм · цинк ${fmt(h.tmp,4)} мм<br>Δt = ${fmt(h.delta,3)} мм (${fmt(h.percent)}%)<br>t после покрытия и допуска = <b>${fmt(h.t,4)} мм</b> · ${s.thicknessMode==='direct'?'готовое значение':h.applied?'допуск учтён':'без уменьшения по допуску'}${s.basis==='catalogue'?'<br>W и I: '+esc(a.p.name)+' · толщина строки '+fmt(a.p.t,3)+' мм. Строка не заменяется.':''}<br>Табл. 2 ГОСТ 14918: стали 220–450.`;
+ $('thicknessInfo').innerHTML=`tосновы = <b>${fmt(h.core,4)}</b> мм · цинк ${fmt(h.tmp,4)} мм<br>Δt = ${fmt(h.delta,3)} мм (${fmt(h.percent)}%)<br>${s.basis==='catalogue'?'t строки ГОСТ':'t после покрытия и допуска'} = <b>${fmt(h.t,4)} мм</b> · ${s.thicknessMode==='direct'?'готовое значение':h.applied?'допуск учтён':'без уменьшения по допуску'}${s.basis==='catalogue'?'<br>W и I: '+esc(a.p.name)+' · толщина строки '+fmt(a.p.t,3)+' мм. Строка не заменяется.':''}<br>Табл. 2 ГОСТ 14918: стали 220–450.`;
 
  }catch(e){$('thicknessInfo').textContent=s.profile?e.message:'Характеристики будут показаны после выбора профиля.';}
 }
@@ -119,4 +119,19 @@ function changeRegime(changed){
  setState(s);
  $('presetNote').textContent=regimeStates[target]?'Восстановлены исходные данные выбранного режима.':'Новый режим. Изменены настройки: '+(changes.join(', ')||'нет')+'. Нагрузки и толщины сохранены; при несовместимости расчёт заблокирован.';
 }
-function changeProfile(){let s=state(),p=D.catalogue[s.profile];if(p){Object.assign(s,{nominalT:p.t,coverWidth:p.cover,blankWidth:p.blank,deckMass:p.mass,thicknessBasis:'steel',thicknessMode:'nominal',accountTolerance:false,massMode:s.massMode});if(s.basis==='geometry'&&!s.profile.startsWith('H75'))s.basis='catalogue';if(s.H<p.h)s.H=Math.max(200,p.h+50);}else Object.assign(s,{basis:'manual',massMode:'manual',thicknessMode:'direct'});if(s.designCode==='snip'){if(s.basis==='geometry')s.basis='catalogue';s.thicknessMode='direct';s.steelT=p?.t||s.steelT;s.grade='manual';}setState(s);}
+let thicknessBeforeCatalogue=null;
+const thicknessKeys=['nominalT','steelT','thicknessMode','thicknessBasis','accountTolerance'];
+function catalogueState(s){
+ const p=D.catalogue[s.profile];if(!p)return s;
+ return {...s,nominalT:p.t,steelT:p.t,thicknessMode:'direct',thicknessBasis:'steel',accountTolerance:false};
+}
+function changeBasis(){
+ let s=state();
+ if(s.basis==='catalogue'){
+  thicknessBeforeCatalogue={profile:s.profile,data:Object.fromEntries(thicknessKeys.map(k=>[k,s[k]]))};
+  s=catalogueState(s);
+ }else if(thicknessBeforeCatalogue?.profile===s.profile){Object.assign(s,thicknessBeforeCatalogue.data);thicknessBeforeCatalogue=null;}
+ setState(s);
+ $('presetNote').textContent=s.basis==='catalogue'?'Выбрана номинальная строка ГОСТ: '+(D.catalogue[s.profile]?.name||'')+'. W, I и опорные проверки используют толщину этой строки. Для уменьшенной толщины выберите геометрический расчёт или подтверждённые характеристики вручную.':'Выбран источник характеристик сечения; проверьте параметры толщины.';
+}
+function changeProfile(){thicknessBeforeCatalogue=null;let s=state(),p=D.catalogue[s.profile];if(p){Object.assign(s,{nominalT:p.t,coverWidth:p.cover,blankWidth:p.blank,deckMass:p.mass,thicknessBasis:'steel',thicknessMode:'nominal',accountTolerance:false,massMode:s.massMode});if(s.basis==='geometry'&&!s.profile.startsWith('H75'))s.basis='catalogue';if(s.H<p.h)s.H=Math.max(200,p.h+50);}else Object.assign(s,{basis:'manual',massMode:'manual',thicknessMode:'direct'});if(s.designCode==='snip'){if(s.basis==='geometry')s.basis='catalogue';s.thicknessMode='direct';s.steelT=p?.t||s.steelT;s.grade='manual';}if(s.basis==='catalogue')s=catalogueState(s);setState(s);}

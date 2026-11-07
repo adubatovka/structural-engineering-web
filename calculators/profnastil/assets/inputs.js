@@ -14,7 +14,7 @@ const {G,catalogue,grades,zincClasses,toleranceRows,defaults}=DeckParameters;
  function normalizeSettings(raw={}){
   const s={...defaults,...raw};delete s.basisAuto;delete s.massAuto;delete s.tableKey;
   if(s.designCode==='snip')s.accountTolerance=false;
-  if(s.designCode==='sp'&&s.basis!=='manual'&&['normal','increased'].includes(s.precision))s.thicknessMode='nominal';
+  if(s.designCode==='sp'&&s.basis==='geometry'&&['normal','increased'].includes(s.precision))s.thicknessMode='nominal';
   if(s.basis==='catalogue'&&s.thicknessBasis==='coated')s.thicknessMode='nominal';
   if(s.designCode==='sp'&&s.thicknessMode==='nominal'&&['normal','increased'].includes(s.precision))s.accountTolerance=true;
   return s;

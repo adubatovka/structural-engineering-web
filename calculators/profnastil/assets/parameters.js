@@ -1,4 +1,5 @@
 const DeckParameters=(()=>{
+ const VERSION='1.8';
  const G=9.80665, E0=206000;
  const catalogue={
   'H75-0.7':{name:'Н75-750-0,7',t:.7,h:75,p:187.5,bw:92,bn:50,I:104.5,wnc:22.5,wnt:29.1,wwc:25.6,wwt:28.1,mass:9.8},
@@ -30,5 +31,5 @@ const DeckParameters=(()=>{
  [3,[.21,.23,.25,.20,.21,.21,.14,.15,.15]], [4,[.23,.25,.27,.21,.22,.23,.16,.17,.17]], [4.5,[.25,.27,.29,.23,.24,.25,.18,.19,.19]]];
  function codeInfo(s){return s.designCode==='sp'?{name:'СП 260.1325800.2023 + СП 266.1325800.2016 (изм. 1–4)',short:'СП 260 / СП 266',limit:200}:s.snipPurpose==='formwork'?{name:'СНиП 3.03.01-87, прил. 11 + Пособие к СНиП II-23-81*, изд. 1989 г.',short:'СНиП · опалубка',limit:500}:{name:'Пособие к СНиП II-23-81*, изд. 1989 г., пп. 25.9, 25.10, 25.13',short:'СНиП · Пособие 1989',limit:150};}
  const defaults={designCode:'sp',snipPurpose:'deck',limitSource:'user',snipRebarDensity:100,projectName:'Расчёт профнастила',units:'si',digits:2,grade:'manual',thicknessMode:'direct',nominalT:.9,thicknessBasis:'steel',coating:275,coatMethod:'sp',coatThickness:.04,precision:'high',accountTolerance:false,tolerance:.11,blankWidth:1250,coverWidth:750,massMode:'manual',defLimitMode:'relative',absoluteLimit:18.1,customName:'Пользовательский профиль',customStandard:'СТО 57398459-18-2025',customH:75,customPitch:187.5,customWide:92,customNarrow:50,profile:'H75-0.9',basis:'catalogue',orientation:'down',n:2,L:3.62,H:200,density:2500,mount:.5,deckMass:12.5,own:true,concreteMode:'geometry',concreteInput:4.19,loadMode:'construction',manualD:5.68,manualN:4.69,pond:true,deflection:'sp266',limit:200,steelT:.9,Ry:245,E:E0,gc:1,gn:1,bearing:300,flanges:'two',stiffener:true,supportConfirmed:false,Iinput:129.6,Wplus:30.2,Wminus:31.6,VR:0,Rend:0,Rinner:0};
-return {G,E0,catalogue,grades,zincClasses,toleranceRows,codeInfo,defaults};
+return {VERSION,G,E0,catalogue,grades,zincClasses,toleranceRows,codeInfo,defaults};
 })();
