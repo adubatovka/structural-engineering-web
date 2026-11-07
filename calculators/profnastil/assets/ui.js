@@ -34,7 +34,18 @@ function syncAutomatic(s){
  for(const k of Object.keys(D.defaults))if($(k)&&a[k]!==s[k]){if(boolkeys.includes(k))$(k).checked=!!a[k];else $(k).value=k==='L'?a[k]*1000:scaledKeys.includes(k)&&uiUnits==='tf'?a[k]/D.G:a[k];}
  return a;
 }
+function updateUnitHints(){
+ const hints={L:'мм. Расстояние между осями соседних опор.',H:'мм. Полная высота перекрытия, включая высоту профиля.',nominalT:'мм. Номинал должен соответствовать выбранной строке профиля.',steelT:'мм. Готовая расчётная толщина стальной основы; покрытие и допуск повторно не вычитаются.',deckMass:'кг/м² полезной площади настила.',Ry:'МПа = Н/мм². Расчётное сопротивление стали.',E:'МПа = Н/мм². Модуль упругости стали.',Iinput:'см⁴/м. Момент инерции на 1 м ширины настила.',Wplus:'см³/м. Момент сопротивления на 1 м ширины при M+.',Wminus:'см³/м. Момент сопротивления на 1 м ширины при M−.',bearing:'мм. Ширина опоры вдоль пролёта.'};
+ for(const k of scaledKeys)hints[k]=['VR','Rend','Rinner'].includes(k)?unit().r+'. Предельная сила на 1 м ширины настила.':unit().q+'. Нагрузка на единицу площади; 1 тс/м² = 9,80665 кПа.';
+ for(const [id,text] of Object.entries(hints)){
+  const input=$(id);input.title=text;
+  const hintId=id+'UnitHint';let hint=$(hintId);
+  if(!hint){hint=document.createElement('small');hint.id=hintId;hint.className='unitHint';input.insertAdjacentElement('afterend',hint);input.setAttribute('aria-describedby',[input.getAttribute('aria-describedby'),hintId].filter(Boolean).join(' '));}
+  hint.textContent=text;
+ }
+}
 function updateFields(s){
+ updateUnitHints();
  const snip=s.designCode==='snip',auto=s.limitSource==='document';
  $('snipPurposeField').classList.toggle('hide',!snip);$('snipRebarField').classList.toggle('hide',!snip||s.snipPurpose!=='formwork');
  $('deflection').disabled=snip||auto;$('defLimitMode').disabled=auto;$('limit').disabled=auto;$('absoluteLimit').disabled=auto;

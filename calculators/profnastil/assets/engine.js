@@ -79,6 +79,7 @@ const {thickness,normalizeSettings,prepareProject}=DeckInputs;
   }
   return{I,Ww:I*10/z.y,Wn:I*10/(h-z.y),yc:z.y,t,delta,parts,crs,chi:ch,Is,As,be,bne,webOK,webcr,mass:properties(parts).A*1000/p*7.85e-3,sd:s1+s3+ss};
  }
+ function finiteResults(values){if(values.some(x=>!Number.isFinite(x)))throw Error('Численная ошибка: переполнение или потеря точности. Проверьте размеры, нагрузки и жёсткость.');}
  function calculate(input={}){
   let {s,p,th,mass,tableProfile}=prepareProject(input);
   ['n','L','H','density','mount','deckMass','concreteInput','manualD','manualN','limit','steelT','Ry','E','gc','gn','bearing','Iinput','Wplus','Wminus','VR','Rend','Rinner'].forEach(k=>{s[k]=Number(s[k]);if(!Number.isFinite(s[k]))throw Error('Некорректное число: '+k);});
@@ -97,6 +98,7 @@ const {thickness,normalizeSettings,prepareProject}=DeckInputs;
   } else if(s.basis==='manual'){wp=s.Wplus;wm=s.Wminus;I=s.Iinput;t=s.steelT;if(Math.min(wp,wm,I,t)<=0)throw Error('Ручные характеристики сечения должны быть положительными');scope.push('Характеристики ручного ввода требуют подтверждённого расчёта или документа изготовителя.');}
   else {let a=tableProfile;wp=s.orientation==='up'?Math.min(a.wwc,a.wwt):Math.min(a.wnc,a.wnt);wm=s.orientation==='up'?Math.min(a.wnc,a.wnt):Math.min(a.wwc,a.wwt);I=s.n===1?(s.orientation==='up'?(a.Iwide||a.I):a.I):Math.min(a.I,a.Iwide||a.I);}
   let MRp=wp*s.Ry*s.gc/1000,MRm=wm*s.Ry*s.gc/1000,EI=s.E*I*1e-5;
+  finiteResults([MRp,MRm,EI]);if(Math.min(MRp,MRm,EI)<=0)throw Error('Численная ошибка: сопротивление или жёсткость обнулились.');
   let top=s.orientation==='up'?p.bw:p.bn,bot=s.orientation==='up'?p.bn:p.bw;
   let heq=s.H-p.h+(p.p-top+bot)/(2*p.p)*p.h;
   let gamma=s.density*G/1000,qb=s.concreteMode==='manual'?s.concreteInput:gamma*heq/1000,qg=s.own?s.deckMass*G/1000:0;
@@ -107,7 +109,9 @@ const {thickness,normalizeSettings,prepareProject}=DeckInputs;
   let loadRows=isOldForm?[{name:'Настил',qn:qg,gf:1.1,sls:true},{name:'Бетон',qn:qb,gf:1.2,sls:true},{name:'Арматура',qn:qarm,gf:1.2,sls:true},{name:'Люди и транспорт',qn:s.mount,gf:1.3,sls:false}]:[{name:'Настил',qn:qg,gf:1.05,sls:true},{name:'Бетон',qn:qb,gf:1.2,sls:true},{name:'Добавка бетона',qn:pond,gf:1.2,sls:true},{name:'Монтажная',qn:s.mount,gf:1.3,sls:true}];
   let qd=s.loadMode==='manual'?s.manualD:loadRows.reduce((v,r)=>v+r.qn*r.gf,0);
   let qn=s.loadMode==='manual'?s.manualN:loadRows.filter(r=>r.sls).reduce((v,r)=>v+r.qn,0);
+  finiteResults([qb,qg,pond,qd,qn,qd*s.gn,fb]);
   let u=beam(s.n,s.L,qd*s.gn,EI),d=beam(s.n,s.L,qn,EI),fn=s.deflection==='sp266'?k*qn*s.L**4/EI*1000:Math.abs(d.Fmax.v)*1000,fu=s.defLimitMode==='absolute'?s.absoluteLimit:s.L*1000/s.limit;if(!(fu>0))throw Error('Предельный прогиб должен быть положительным');
+  finiteResults([fn,fu,...u.R,...d.R,...u.points.flatMap(p=>[p.M,p.V,p.f]),...d.points.flatMap(p=>[p.M,p.V,p.f])]);
   if(s.designCode==='sp'&&s.deflection!=='sp266')warnings.push('Точный упругий прогиб относится к одновременному равномерному загружению всех пролётов; он не заменяет проверку по коэффициентам СП 266.');
   if(s.defLimitMode!=='absolute'&&s.limit!==code.limit)warnings.push('Предел L/'+s.limit+' задан пользователем; по выбранному документу принят L/'+code.limit+'.');
   if(s.defLimitMode==='absolute'&&fu>s.L*1000/code.limit+1e-6)warnings.push('Абсолютный предел превышает L/'+code.limit+' выбранного документа.');
@@ -158,6 +162,7 @@ const {thickness,normalizeSettings,prepareProject}=DeckInputs;
    checks.push({name:message,demand:null,capacity:null,k:Infinity,unit:'—'});warnings.push(message);
   }else if(VR&&u.Vmax>VR*.5){let kmv=0;u.points.forEach(p=>{let reduction=Math.max(0,1-Math.max(0,2*Math.abs(p.V)/VR-1)**2),mr=p.M>=0?MRp:MRm;kmv=Math.max(kmv,reduction>0?Math.abs(p.M)/mr/reduction:Infinity);});checks.push({name:'M + V (СП 260, 8.8)',demand:kmv,capacity:1,k:kmv,unit:'—'});}
   checks.push({name:'Прогиб',demand:fn,capacity:fu,k:fn/fu,unit:'мм',sls:true});
+  for(const c of checks){finiteResults([c.demand,c.capacity].filter(x=>x!==null));if(!(c.k===Infinity&&c.demand===null&&c.capacity===null))finiteResults([c.k]);}
   const strength=Math.max(...checks.filter(x=>!x.sls).map(x=>x.k));
   if(u.R.some(x=>x<-.0001))scope.push('Возникает отрыв от опоры; требуется проверка креплений.');
   return{s,p,th,mass,tableProfile,code,snipWalls,qarm,loadRows,t,sec,wp,wm,I,MRp,MRm,EI,heq,gamma,qb,qg,pond,pondNeeded,fb,qd,qn,k,fn,fu,u,d,VR,Rend,Rinner,lambda,Rs,ka,checks,supportRows,strength,stiffness:fn/fu,warnings,scope:[...new Set(scope)]};

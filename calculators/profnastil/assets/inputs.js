@@ -19,9 +19,15 @@ const {G,catalogue,grades,zincClasses,toleranceRows,defaults}=DeckParameters;
   if(s.designCode==='sp'&&s.thicknessMode==='nominal'&&['normal','increased'].includes(s.precision))s.accountTolerance=true;
   return s;
  }
+ function validateOptions(s,allowIncomplete=false){
+ for(const [k,values] of Object.entries({designCode:['sp','snip'],snipPurpose:['deck','formwork'],limitSource:['document','user'],basis:['catalogue','geometry','manual'],orientation:['up','down'],units:['si','tf'],thicknessMode:['nominal','direct'],thicknessBasis:['steel','coated'],coatMethod:['sp','mass','manual'],precision:['normal','increased','high','manual'],massMode:['manual','catalogue','blank'],loadMode:['manual','construction'],concreteMode:['manual','geometry'],deflection:['sp266','elastic'],defLimitMode:['absolute','relative'],flanges:['one','two']}))if(!values.includes(s[k]))throw Error('Неизвестный параметр: '+k);
+ if(![2,3].includes(s.digits))throw Error('Число знаков после запятой: 2 или 3');
+ if(!(allowIncomplete&&s.profile==='')&&s.profile!=='custom'&&!Object.hasOwn(catalogue,s.profile))throw Error('Неизвестный профиль');
+ if(s.grade!=='manual'&&!Object.hasOwn(grades,s.grade))throw Error('Неизвестная марка стали');
+ }
  function prepareProject(raw={}){
  let s={...defaults,...raw};delete s.basisAuto;delete s.massAuto;delete s.tableKey;for(const [k,v] of Object.entries(defaults)){if(typeof v==='number'){s[k]=Number(s[k]);if(!Number.isFinite(s[k]))throw Error('Некорректное число: '+k);}if(typeof v==='boolean'&&typeof s[k]!=='boolean')throw Error('Некорректный флажок: '+k);}
- for(const [k,values] of Object.entries({designCode:['sp','snip'],snipPurpose:['deck','formwork'],limitSource:['document','user'],basis:['catalogue','geometry','manual'],orientation:['up','down'],units:['si','tf'],thicknessMode:['nominal','direct'],thicknessBasis:['steel','coated'],coatMethod:['sp','mass','manual'],precision:['normal','increased','high','manual'],massMode:['manual','catalogue','blank'],loadMode:['manual','construction'],concreteMode:['manual','geometry'],deflection:['sp266','elastic'],defLimitMode:['absolute','relative'],flanges:['one','two']}))if(!values.includes(s[k]))throw Error('Неизвестный параметр: '+k);
+ validateOptions(s);
  let p=s.profile==='custom'?{name:String(s.customName).slice(0,150),t:s.nominalT,h:s.customH,p:s.customPitch,bw:s.customWide,bn:s.customNarrow,mass:s.deckMass,cover:s.coverWidth,blank:s.blankWidth,standard:s.customStandard}:catalogue[s.profile];if(!p)throw Error('Неизвестный профиль');
  if(s.profile==='custom'&&(Math.min(p.h,p.p,p.bw,p.bn,p.cover)<=0||p.bw+p.bn>=2*p.p||s.basis!=='manual'||s.massMode==='catalogue'))throw Error('Профиль СТО/ТУ: задайте размеры, ручные характеристики и массу по паспорту или заготовке.');
  for(const k of ['Ry','E','gc','gn','Iinput','Wplus','Wminus'])if(s[k]<=0)throw Error('Параметр должен быть положительным: '+k);
@@ -47,5 +53,5 @@ const {G,catalogue,grades,zincClasses,toleranceRows,defaults}=DeckParameters;
  if(s.basis!=='catalogue')s.steelT=th.t;
  return{s,p,th,mass,tableProfile};
  }
-return {thickness,normalizeSettings,prepareProject};
+return {validateOptions,thickness,normalizeSettings,prepareProject};
 })();

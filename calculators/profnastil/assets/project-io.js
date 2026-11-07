@@ -12,6 +12,7 @@ function validateInputs(inputs,allowIncomplete=false){
  for(const k of ['VR','Rend','Rinner','mount','manualD','manualN','snipRebarDensity'])if(s[k]<0)throw Error('Отрицательное значение недопустимо: '+k);
  for(const k of ['steelT','nominalT','L'])if(s[k]<0||!allowIncomplete&&s[k]===0)throw Error('Недопустимый размер: '+k);
  if(!['sp','snip'].includes(s.designCode)||!['deck','formwork'].includes(s.snipPurpose))throw Error('Неизвестный расчётный режим');
+ DeckInputs.validateOptions(s,allowIncomplete);
  return s;
 }
 function parseProject(j){let s={};if(!j||typeof j!=='object'||Array.isArray(j))throw Error('Ожидается объект JSON');
