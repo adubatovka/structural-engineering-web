@@ -17,7 +17,7 @@ function validateInputs(inputs,allowIncomplete=false){
 }
 function parseProject(j){let s={};if(!j||typeof j!=='object'||Array.isArray(j))throw Error('Ожидается объект JSON');
 if(j.format==='profnastil-independent'){
- if(!['1.7','1.8'].includes(j.version))throw Error('Неподдерживаемая версия JSON');
+ if(!['1.7','1.8',DeckParameters.VERSION].includes(j.version))throw Error('Неподдерживаемая версия JSON');
  if(!['mm','m'].includes(j.length_unit))throw Error('Укажите единицы пролёта: mm или m');
  s=validateInputs(j.inputs);if(j.length_unit==='mm')s.L/=1000;
  if(j.regime_states!==undefined){
@@ -32,7 +32,7 @@ if(a.standard!=='ГОСТ 24045-2016'||a.deck!=='Н75-750'||!D.catalogue[key])th
 if(b.def_method!=='Относительный'||b.load_method!=='Несъемная опалубка'||o.q_parameter_1!=='Закреплённая на опоре')throw Error('Этот режим расчёта не поддерживается импортом.');if(!['Вверх','Вниз'].includes(a.orient)||!['Бетоноводами','Из бадей'].includes(b.concreting_method)||!['На одну полку','На две полки'].includes(o.q_parameter_2))throw Error('Неизвестная схема нагружения.');
 s={projectName:j.Utility.project_name+' · '+j.Utility.calc_name,profile:key,basis:'geometry',thicknessMode:'nominal',nominalT:t,thicknessBasis:'coated',coating:coat,coatMethod:coat===275?'manual':'mass',coatThickness:.0385,precision:pr,accountTolerance:!!a.gap_check,grade,orientation:a.orient==='Вверх'?'up':'down',n:Number(b.number_spans),L:Number(b.span),H:Number(b.h_slab),mount:b.concreting_method==='Бетоноводами'?.5:2.5,own:false,pond:false,deflection:'elastic',limit:Number(b.def_n),gc:Number(c.gamma_c??1),gn:Number(c.gamma_n??1),bearing:Number(o.l_a),flanges:o.q_parameter_2==='На одну полку'?'one':'two'};
 }else throw Error('Формат не распознан. Поддерживаются JSON этого калькулятора и проверенная внешняя схема для Н75.');s=D.normalizeSettings(s);D.calculate(s);return s;}
-function restoreProject(j){const s=parseProject(j);thicknessBeforeCatalogue=null;regimeStates=j.regime_states?structuredClone(j.regime_states.states):{};activeRegime=null;setState(s);}
+function restoreProject(j){const s=parseProject(j);thicknessBeforeCatalogue=null;regimeStates=j.regime_states?structuredClone(j.regime_states.states):{};activeRegime=null;setState(s,{autoName:s.projectName===profileTitle(s)});$('preset').value='';$('presetNote').textContent='Загружены пользовательские исходные данные; стартовый шаблон не применяется.';}
 async function importJSON(file){try{if(file.size>2e6)throw Error('Файл больше 2 МБ');restoreProject(JSON.parse(await file.text()));$('presetNote').textContent='Загружены исходные данные JSON; результаты пересчитаны собственным ядром.';toast('JSON загружен.');}catch(e){toast('Не удалось открыть: '+e.message);}finally{$('importFile').value='';}}
 const storageKey='profnastil.projects.v12';let deletedProject=null;
 function readProjects(){let a=JSON.parse(localStorage.getItem(storageKey)||'[]');if(!Array.isArray(a))throw Error('Некорректное хранилище');return a;}

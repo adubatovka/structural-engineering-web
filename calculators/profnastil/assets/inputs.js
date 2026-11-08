@@ -1,5 +1,10 @@
 const DeckInputs=(()=>{
 const {G,catalogue,grades,zincClasses,toleranceRows,defaults}=DeckParameters;
+ function slabGeometry(totalMm,profileHeightMm){
+  if(!Number.isFinite(totalMm)||!Number.isFinite(profileHeightMm)||profileHeightMm<=0||totalMm<profileHeightMm)throw Error('Общая толщина плиты H должна быть не меньше высоты профнастила h.');
+  const coverMm=totalMm-profileHeightMm;
+  return {totalMm,profileHeightMm,coverMm,coverCm:coverMm/10};
+ }
  function thickness(s){
  const nominal=Number(s.nominalT),coating=Number(s.coating),width=Number(s.blankWidth);
  if(!zincClasses.includes(coating)||nominal<=0||width<=0)throw Error('Проверьте номинальную толщину, класс покрытия и ширину заготовки.');
@@ -53,5 +58,5 @@ const {G,catalogue,grades,zincClasses,toleranceRows,defaults}=DeckParameters;
  if(s.basis!=='catalogue')s.steelT=th.t;
  return{s,p,th,mass,tableProfile};
  }
-return {validateOptions,thickness,normalizeSettings,prepareProject};
+return {validateOptions,thickness,normalizeSettings,prepareProject,slabGeometry};
 })();
