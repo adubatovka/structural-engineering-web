@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow,noarchive"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#126b70"><meta name="description" content="Расчёт болтов поясов: схемы ВП и НП, выбор болтов и учёт QY. Работает офлайн."><title>Расчёт болтов поясов</title>
+<style>
+:root{color-scheme:light;--bg:#f3f5f7;--ink:#243445;--muted:#6a7886;--line:#dde4e9;--blue:#126b70;--ok:#16735b;--bad:#b43e4c;--warn:#986524;--teal:#157a7d;--amber:#b77a2c}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}button,summary{cursor:pointer}button,input,select{touch-action:manipulation}button:disabled{opacity:.4;cursor:not-allowed}[hidden]{display:none!important}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid #81bfc5;outline-offset:3px}button{min-height:40px;border:1px solid #d4dde4;border-radius:8px;background:#fff;padding:9px 13px;font-weight:600;color:var(--ink)}button:hover:enabled{background:#f2f7f8;border-color:#8fadb4}button.primary{background:var(--blue);border-color:var(--blue);color:#fff}button.primary:hover:enabled{background:#0b555a}button svg{vertical-align:-3px;margin-right:5px}select{width:100%;min-height:43px;border:1px solid #ccd7df;border-radius:7px;background:#fff;padding:9px 11px;color:var(--ink);font-weight:600}label{font-weight:600}
+.hero{background:#fff;border-bottom:1px solid var(--line)}.hero-inner{max-width:1456px;margin:auto;padding:24px 28px 22px;display:flex;align-items:center;gap:16px}.brand-mark{width:48px;height:48px;display:grid;place-items:center;border-radius:11px;background:#eaf3f3;color:var(--teal);flex:none}.hero-title{flex:1;min-width:0}.eyebrow{font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}.hero h1{font-size:clamp(22px,2.5vw,29px);letter-spacing:-.035em;margin:3px 0 0;line-height:1.25}.version{font-size:11px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:7px}.version:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}.shell{max-width:1456px;margin:auto;padding:0 28px 28px}.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:7px;padding:15px 0}.toolbar button{font-size:12px;min-height:38px}.toolbar-spacer{flex:1}.toolbar .quiet{background:transparent;border-color:transparent;color:#526475}.toolbar .quiet:hover:enabled{background:#e8eef2;border-color:#d4dde4}.panel{min-width:0;max-width:100%;background:white;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 2px 3px #25394d02}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 0}.panel-head h2{font-size:15px;letter-spacing:-.02em;margin:0}.panel-body{padding:16px 20px 20px}.mini,.subnote{color:var(--muted);font-size:11px}.subnote{margin:12px 0 0;line-height:1.55}
+.setup-panel{margin-bottom:18px;padding:17px 20px}.setup-label{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px;font-size:12px;font-weight:650}.setup-label span{font-size:11px;font-weight:400;color:var(--muted)}.connection-picker{display:grid;grid-template-columns:1fr 1fr;gap:12px}.connection-choice{display:flex;align-items:center;text-align:left;padding:13px 15px;gap:14px;border:1px solid #d8e1e8;border-radius:9px;position:relative;min-width:0}.connection-choice svg{width:52px;height:54px;margin:0;flex:none}.connection-choice .choice-copy{flex:1;min-width:0}.connection-choice strong{display:block;font-size:14px}.connection-choice small{display:block;font-size:11px;font-weight:400;color:var(--muted);margin-top:2px}.choice-formula{font-size:13px;font-family:Georgia,"Times New Roman",serif;font-style:italic;white-space:nowrap;margin-right:22px;color:#425c6b}.choice-check{position:absolute;right:11px;top:11px;border:1px solid #cbd8de;width:15px;height:15px;border-radius:50%;display:grid;place-items:center;font-size:10px;color:transparent}.connection-choice[aria-pressed="true"]{border-color:var(--teal);background:#f0f8f7;box-shadow:inset 0 0 0 1px var(--teal)}.connection-choice[aria-pressed="true"] .choice-check{background:var(--teal);color:white;border-color:var(--teal)}.connection-choice[data-connection="section"][aria-pressed="true"]{border-color:var(--amber);background:#fffbf3;box-shadow:inset 0 0 0 1px var(--amber)}.connection-choice[data-connection="section"][aria-pressed="true"] .choice-check{background:var(--amber);border-color:var(--amber)}.node-panel{margin-top:16px;padding-top:14px;border-top:1px solid #e7edf1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}.node-chooser label,.mode-label{display:block;font-size:11px;font-weight:600;color:#526475;margin-bottom:6px}.node-controls{display:flex;gap:6px}.node-controls select{min-width:0;font-size:13px}.node-controls button{width:38px;padding:0;font-size:21px;flex:none}.reference{font-size:10px;color:var(--muted);margin-top:5px;min-height:15px}.reference.edited{color:var(--warn)}.mode-picker{display:flex;padding:3px;background:#f0f3f5;border-radius:8px;gap:3px}.mode-picker label{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid transparent;border-radius:6px;font-size:12px;cursor:pointer;padding:8px 7px;min-height:36px;color:#66788b}.mode-picker label.selected{background:#fff;border-color:#d7e1e7;box-shadow:0 1px 2px #1d34440c;color:var(--blue)}.mode-picker input{margin:0;accent-color:var(--blue)}
+.grid-main{display:grid;grid-template-columns:minmax(350px,410px) minmax(0,1fr);gap:18px;align-items:start}.stack{display:grid;gap:18px;min-width:0}.input-head{padding:18px 18px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px}.input-head h2{font-size:15px;margin:0}.section-index{font-size:10px;color:#7b8c98;background:#f1f4f6;border-radius:4px;padding:3px 7px;font-weight:650;letter-spacing:.04em}.tabs{display:flex;border-bottom:1px solid var(--line);padding:0 18px;gap:23px}.tab{font-size:12px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:var(--muted);padding:11px 0 10px;white-space:nowrap}.tab[aria-selected="true"]{border-color:var(--teal);color:var(--teal)}.tab:hover:enabled{background:transparent;color:var(--teal)}.tab-panel{padding:18px}.fields{display:grid;grid-template-columns:1fr;gap:14px}.field{min-width:0;border-bottom:1px solid #edf1f4;padding-bottom:12px}.field:last-child{border-bottom:0;padding-bottom:0}.field-label{display:flex;justify-content:space-between;gap:7px;margin-bottom:7px;font-size:12px}.field-label label{font-weight:500}.field-symbol{font-weight:700;color:#344e62}.unit{color:var(--muted);font-size:11px;font-weight:400;white-space:nowrap}.field-inputs{display:flex;align-items:center;gap:17px}.range{flex:1;width:0;min-width:20px;accent-color:var(--teal);cursor:pointer;height:27px}.val{min-width:0;width:108px;flex:none;border:1px solid #cdd8e0;border-radius:7px;background:#fcfdfd;padding:8px 11px;text-align:right;color:var(--ink);font-size:15px;font-weight:650;font-variant-numeric:tabular-nums;min-height:39px}.val:focus{background:#fff}.val.error{border-color:var(--bad);background:#fff6f5}.field-error{font-size:11px;margin-top:5px;color:var(--bad)}.field-error:empty,.range-note:empty{display:none}.range-note{font-size:10px;color:var(--muted);margin-top:4px}.selectors{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}.selectors label{display:block;font-size:11px;margin-bottom:6px}.selectors select{font-size:13px}.chips{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:17px}.chip{font-size:11px;min-height:29px;padding:3px 7px;border-radius:5px;background:#f8fafb}.chip.current{background:#eaf5f4;border-color:#94bcbf;color:var(--teal)}.checkline{display:flex;align-items:center;gap:7px;font-weight:400;font-size:11px;margin-top:12px;color:#546b7c}.checkline input{accent-color:var(--teal);width:15px;height:15px;flex:none;margin:0}.method-summary{padding:11px 12px;border:1px solid #dbe7e7;background:#f4f9f9;border-radius:7px;font-size:12px;margin-bottom:16px}.method-summary strong{font-weight:650;display:block}.method-summary small{color:var(--muted);font-size:10px;display:block;margin-top:4px}.extra-geometry{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}.tab-errors:not(:empty){display:inline-grid;place-items:center;border-radius:9px;background:var(--bad);color:white;font-size:9px;min-width:16px;height:16px;margin-left:5px}
+.results .panel-head{padding-top:15px}.result-tags{display:flex;gap:6px;align-items:center}.tag{font-size:10px;padding:3px 7px;border-radius:4px;background:#f0f4f7;color:#506578;white-space:nowrap}.tag.type{color:var(--teal);background:#eaf5f4}.tag.type.np{color:#946226;background:#fff1dc}.resultbox{margin:12px 15px 0;padding:15px 18px;background:#223e46;border-radius:9px;color:white}.model-name{font-size:10px;color:#b9cdd1;margin-bottom:12px}.result-duo{display:grid;grid-template-columns:1fr 1fr .85fr;gap:20px}.result-label{font-size:11px;color:#bcd0d3;min-height:20px}.result-value{font-size:31px;font-weight:700;line-height:1.2;letter-spacing:-.035em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.result-value small{font-size:11px;font-weight:400;letter-spacing:0;color:#bcd0d3}.use-value{font-size:25px;line-height:1.5;font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:-.02em}.resultbar{height:5px;background:#48646a;margin-top:7px;overflow:hidden;border-radius:5px}.resultbar>div{height:100%;background:#6dd0b5;transition:width .15s}.status{border-top:1px solid #46666b;margin-top:14px;padding-top:10px;color:#8ee1c5;font-size:12px;font-weight:600}.status.fail{color:#ffb4bc}.status.invalid{color:#f3d098}.status-rounding{font-size:10px;color:#c7dadd;margin-top:6px}.quick-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:11px 19px 13px;font-size:11px}.quick-metrics>div{display:flex;flex-direction:column;gap:2px}.quick-metrics span{color:var(--muted);font-size:10px}.quick-metrics strong{font-weight:600;font-variant-numeric:tabular-nums}.component-details{border-top:1px solid var(--line);padding:11px 19px;font-size:11px}.component-details summary{font-size:11px;color:#4e6375;font-weight:600}.component-details[open] summary{margin-bottom:12px}.component-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}.comp-row{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;margin:8px 0;font-size:11px}.comp-row>strong{flex:0 0 30px}.comp-track{min-width:0;flex:1;height:5px;background:#e7edef;border-radius:5px;overflow:hidden}.comp-bar{height:100%;background:#528c91}.comp-value{flex:0 0 73px;text-align:right;font-variant-numeric:tabular-nums}.comp-caption{flex:0 0 100%;font-size:10px;color:var(--muted)}.comp-row.inactive{opacity:.5}.metric{display:flex;justify-content:space-between;gap:10px;font-size:11px;border-top:1px solid var(--line);padding-top:10px;margin-top:9px}.metric span{color:var(--muted)}.ref-line,.summary-foot{font-size:10px;color:var(--muted);margin-top:7px}.warnings{font-size:11px;line-height:1.55;margin:10px 15px 15px;padding:10px 12px;background:#fffaef;border:1px solid #edddbc;border-radius:7px;color:#88612a}.warnings p{margin:0}.warnings p+p{margin-top:5px}.warnings.errors{background:#fff6f5;border-color:#e9c9cc;color:var(--bad)}.warnings .error-link{display:block;border:0;background:transparent;color:inherit;min-height:28px;width:100%;text-align:left;padding:2px 0;font-size:11px;font-weight:500}.warnings .error-link:hover{background:#fbe9e9;text-decoration:underline}
+.scheme-title{display:flex;gap:8px;align-items:center}.scheme-title .section-index{color:var(--teal);background:#eaf5f4}.scheme-title .section-index.np{color:#966727;background:#fff2dc}.scheme-expand{font-size:11px;padding:5px 9px;min-height:32px;font-weight:500}.scheme-body{padding:13px 15px 15px}.scheme-legend{display:flex;align-items:center;gap:15px;font-size:10px;color:var(--muted);margin:0 2px 11px;flex-wrap:wrap}.legend-item{display:flex;align-items:center;gap:5px}.legend-swatch{width:10px;height:10px;border-radius:2px;border:1px solid #71939c;background:#e5edf1}.legend-swatch.belt{border-color:#4e9295;background:#cae4e1}.legend-swatch.web{border-color:#b88b4a;background:#f5dfba}.drawing-wrap{width:100%;min-width:0;max-width:100%;background:#fcfdfd;border:1px solid #e0e7ed;border-radius:8px;overflow:auto}.drawing-wrap svg{display:block;width:100%;height:auto;min-width:0}.scheme-hint{display:none}.drawing-caption{font-size:10px;color:var(--muted);margin:9px 1px 0;line-height:1.55}.distribution{display:grid;grid-template-columns:1fr auto;align-items:center;gap:9px 14px;padding:12px 14px;border:1px solid #d7e8e7;border-radius:7px;background:#f2f8f7;margin-top:11px}.distribution.np{border-color:#eedfca;background:#fffbf4}.distribution-label{font-size:10px;color:var(--muted);margin-bottom:3px}.distribution-equation{font-size:14px;font-family:Georgia,"Times New Roman",serif}.distribution-value{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em;white-space:nowrap}.distribution-value small{font-size:11px;font-weight:400;color:var(--muted);margin-left:4px}.distribution-meta{font-size:10px;color:var(--muted);grid-column:1/-1;border-top:1px solid #e8ddcc;padding-top:7px}.drawing-wrap.expanded{position:fixed;inset:24px;width:auto;max-width:none;z-index:31;background:#fff;box-shadow:0 0 0 100vmax #182c45b3;overflow:auto;padding:42px 12px 12px;border-radius:10px}.drawing-wrap.expanded svg{min-width:1000px;max-width:1400px;margin:auto}.expanded .scheme-hint{display:block;position:sticky;left:0;top:0;font-size:11px;color:var(--muted);background:#fff;width:230px;padding:3px 6px}.scheme-close{display:none;position:fixed;right:36px;top:34px;z-index:32;min-height:30px;padding:5px 10px;font-size:11px}.scheme-close.visible{display:block}.dim-control{cursor:pointer}.dim-control:focus{outline:none}.scheme-dimension-hit{fill:transparent;stroke:none}.dim-control:hover rect,.dim-control:focus rect{fill:#117b7b0b;stroke:#117b7b;stroke-width:1.5}.formula-panel{margin-top:18px}.formula-panel summary{padding:15px 20px;font-size:12px;font-weight:600}.formula-panel .panel-body{padding-top:0}.formula{font:12px/1.7 ui-monospace,Consolas,monospace;white-space:normal;overflow-wrap:anywhere;padding:8px 10px;background:#f5f8fa;border-radius:6px;margin:6px 0}.formula.active{border-left:3px solid var(--teal);background:#eff7f6}.formula.active.np{border-color:var(--amber);background:#fffaf2}.formula-type{color:var(--muted);font-weight:400;font-size:11px;margin-left:7px}.footer{display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:10px;margin-top:17px}.notice{margin-bottom:15px;border:1px solid #bfceda;background:#f1f6fa;border-radius:8px;padding:12px 15px;display:flex;align-items:center;gap:10px;font-size:12px}.notice span{flex:1}.notice button{min-height:32px;padding:5px 9px;font-size:11px}.notice.error{color:var(--bad);background:#fff5f4;border-color:#dbb4b7}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#223e46;color:#fff;padding:11px 16px;border-radius:8px;box-shadow:0 8px 25px #152c4430;z-index:40;font-size:12px;max-width:90vw}.live-strip,#printSheet{display:none}.skip{position:absolute;top:-70px;left:20px;background:white;padding:10px;z-index:50}.skip:focus{top:10px}
+@media(min-width:1100px){#inputPanel{position:sticky;top:18px}}
+@media(min-width:1600px){.shell,.hero-inner{max-width:1576px}.grid-main{grid-template-columns:450px minmax(0,1fr)}}
+@media(max-width:1100px){.shell{padding:0 20px 25px}.hero-inner{padding:22px 20px}.grid-main{grid-template-columns:340px minmax(0,1fr);gap:14px}.stack{gap:14px}.result-duo{gap:12px}.result-value{font-size:25px}.use-value{font-size:21px}.resultbox{padding:13px;margin:11px 12px 0}.result-label{font-size:10px;min-height:30px}.panel-head{padding:15px 15px 0}.choice-formula{display:none}.component-grid{grid-template-columns:1fr}.quick-metrics{margin:11px 15px;font-size:10px}.scheme-title h2{font-size:14px}.scheme-expand{font-size:10px}.toolbar-spacer{display:none}.toolbar .quiet{margin-left:auto}.toolbar #undoBtn{margin-left:0}}
+@media(max-width:860px){.grid-main{display:flex;flex-direction:column}.grid-main>#inputPanel,.stack{width:100%}.stack{display:contents}#results{order:0}#inputPanel{order:1}#schemePanel{order:2}.fields{grid-template-columns:1fr 1fr;gap:15px 24px}.field{padding-bottom:10px}.result-label{min-height:20px}.result-value{font-size:30px}.use-value{font-size:26px}.result-duo{gap:25px}.component-grid{grid-template-columns:1fr 1fr}.quick-metrics{margin:12px 18px}.panel-head{padding:16px 18px 0}.setup-panel{padding:15px 17px}.connection-choice{padding:12px;gap:10px}.connection-choice svg{width:42px}.connection-choice strong{font-size:13px}.node-panel{gap:15px}.connection-choice small{font-size:10px}.shell{padding-bottom:82px}.live-strip{display:flex;position:fixed;bottom:0;left:0;right:0;align-items:center;justify-content:space-between;gap:15px;background:#223e46;color:#fff;padding:10px 18px max(10px,env(safe-area-inset-bottom));text-decoration:none;font-size:12px;z-index:10;box-shadow:0 -2px 12px #12243c15}.live-strip strong{font-variant-numeric:tabular-nums}.live-strip small{color:#b9cfd3;font-size:10px}.toast{bottom:78px}}
+@media(max-width:560px){.hero-inner{padding:20px 14px;gap:10px}.brand-mark{width:38px;height:42px;border-radius:8px}.brand-mark svg{width:26px}.hero h1{font-size:21px}.eyebrow{font-size:8px;letter-spacing:.08em}.version{font-size:10px;align-self:flex-start;margin-top:2px}.version:before{display:none}.version .offline-word{display:none}.shell{padding:0 12px 80px}.toolbar{gap:5px;padding:11px 0}.toolbar button{font-size:10px;padding:8px 9px;min-height:36px}.toolbar #saveHTML{flex:1}.toolbar-spacer{display:none}.toolbar #resetBtn{margin-left:0}.toolbar .quiet{padding-left:7px;padding-right:7px}.toolbar #saveJSON,.toolbar #loadJSON{font-size:10px}.setup-panel{padding:13px 12px;margin-bottom:13px}.setup-label{font-size:11px}.setup-label span{display:none}.connection-picker{gap:7px}.connection-choice{display:block;padding:10px 9px;min-height:115px}.connection-choice svg{width:30px;height:34px;float:left;margin:1px 7px 10px 0}.connection-choice .choice-copy{padding-top:3px}.connection-choice strong{font-size:12px;line-height:1.4;padding-right:5px}.connection-choice small{font-size:10px;line-height:1.4;margin-top:8px;clear:both}.choice-check{right:7px;top:7px;width:12px;height:12px;font-size:8px}.node-panel{grid-template-columns:1fr;gap:10px;margin-top:12px;padding-top:12px}.node-controls select{font-size:12px;min-height:40px}.mode-picker label{font-size:11px;min-height:32px;padding:6px}.reference{font-size:9px}.fields{grid-template-columns:1fr;gap:13px}.input-head{padding:16px 16px 9px}.tabs{padding:0 16px;gap:28px}.tab-panel{padding:16px}.tabs .tab{font-size:12px}.panel-head{padding:14px 14px 0}.result-tags{gap:4px}.tag{font-size:9px;padding:3px 5px}.resultbox{padding:14px;margin:11px 10px 0}.result-duo{grid-template-columns:1fr 1fr;gap:13px 20px}.use-block{grid-column:1/-1;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}.use-block .result-label{min-height:0}.use-value{font-size:14px;line-height:1.3}.use-block .resultbar{grid-column:1/-1;margin-top:0}.result-value{font-size:29px}.result-label{font-size:10px}.model-name{font-size:10px;margin-bottom:10px}.status{font-size:11px;margin-top:12px}.quick-metrics{gap:7px;margin:11px 14px;font-size:10px}.quick-metrics span{font-size:9px}.component-grid{grid-template-columns:1fr}.component-details{padding:10px 14px}.scheme-title h2{font-size:13px}.scheme-title{gap:6px}.scheme-expand{font-size:10px;padding:5px 7px}.scheme-body{padding:12px 10px}.scheme-legend{font-size:9px;gap:8px}.distribution{padding:10px;gap:8px}.distribution-equation{font-size:13px}.distribution-value{font-size:16px}.distribution-meta{font-size:9px}.drawing-caption{font-size:9px}.footer{display:block;font-size:9px}.footer span{display:block;margin-top:4px}.notice{flex-wrap:wrap}.notice span{min-width:200px}.drawing-wrap.expanded{inset:8px;padding:42px 6px 6px}.scheme-close{top:18px;right:20px}.formula-panel summary{padding:13px 16px}.formula-panel .panel-body{padding:0 12px 14px}.formula{font-size:10px}.formula-type{font-size:9px}.subnote{font-size:10px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+@page{size:A4 portrait;margin:12mm}
+@media print{body{background:white;color:#111;font:10px/1.35 Arial,sans-serif}body>*{display:none!important}#printSheet{display:block!important}#printSheet h1{white-space:nowrap;font-size:18px;letter-spacing:-.02em;margin:0 0 5px}#printSheet h2{font-size:11px;margin:10px 0 5px}#printSheet p{margin:4px 0}.print-top{border-bottom:1px solid #888;padding-bottom:8px;margin-bottom:9px;display:flex;justify-content:space-between;gap:10px}.print-top>div:first-child{flex:1;min-width:0}.print-date{flex:none;text-align:right;font-size:9px;color:#444}.print-result{display:flex;gap:17px;align-items:center;border:1px solid #777;border-radius:5px;padding:10px 12px;margin:8px 0;font-size:11px}.print-result strong{font-size:17px}.print-columns{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:14px}.print-table{width:100%;border-collapse:collapse;font-size:9px}.print-table td{padding:3px 0;border-bottom:1px solid #ddd}.print-table td:last-child{text-align:right;font-weight:bold;white-space:nowrap;padding-left:5px}.print-scheme{border:1px solid #aaa;margin-top:10px;border-radius:5px;break-inside:avoid}.print-scheme svg{display:block;width:100%;height:auto;max-height:112mm}.print-components{display:flex;justify-content:space-between;gap:7px;border-top:1px solid #aaa;padding-top:7px;margin-top:9px;font-size:10px}.print-warning{font-size:9px;color:#333;margin-top:8px!important}.print-source{border-top:1px solid #aaa;font-size:8px;color:#555;padding-top:6px;margin-top:8px!important}.print-error{border:1px solid #b33b48;padding:20px;color:#b33b48}}
+@media print{.print-formulas{font-size:8px;line-height:1.5;padding:6px 8px;border:1px solid #ccc;border-radius:3px;margin-top:8px;break-inside:avoid}.print-formulas div{white-space:normal}.print-scheme svg{max-height:108mm}.print-scheme svg .dim-control{display:none}.print-warning{font-size:8px}.print-source{font-size:8px}}
+</style></head><body>
+<a class="skip" href="#inputPanel">К исходным данным</a>
+<header class="hero"><div class="hero-inner"><div class="brand-mark" aria-hidden="true"><svg width="32" height="34" viewBox="0 0 32 34" fill="none"><path d="M3 4h26v6H19v14h10v6H3v-6h10V10H3z" fill="currentColor"/><path d="M1 1h30M1 33h30" stroke="currentColor" stroke-width="1.5"/></svg></div><div class="hero-title"><div class="eyebrow">Соединения металлоконструкций</div><h1>Расчёт болтов поясов</h1></div><span class="version"><span class="offline-word">Работает офлайн · </span>v3.5</span></div></header>
+<main class="shell">
+<div class="toolbar" role="group" aria-label="Сохранение и печать"><button class="primary" id="saveHTML" type="button">↓ Сохранить HTML</button><button id="printBtn" type="button">Печать / PDF</button><button id="saveJSON" type="button">↓ JSON</button><button id="loadJSON" type="button">↑ Загрузить JSON</button><span class="toolbar-spacer"></span><button class="quiet" id="resetBtn" type="button" title="Восстановить исходные параметры выбранного узла">↻ Обновить узел</button><button class="quiet" id="undoBtn" type="button" disabled title="Отменить последнее изменение параметров">↶ Отменить</button><input id="jsonFile" type="file" accept=".json,application/json" aria-label="Импорт параметров" hidden></div>
+<div id="startupAlert" class="notice error" role="alert" hidden></div><div id="draftBanner" class="notice" hidden><span id="draftMessage">Найден сохранённый черновик.</span><button id="restoreDraft" type="button">Восстановить</button><button id="dismissDraft" type="button">Удалить черновик</button></div>
+<section class="panel setup-panel" aria-label="Тип соединения и исходный узел">
+<div class="setup-label">Тип соединения<span>Переключает схему и формулу, сохраняя введённые значения</span></div>
+<div class="connection-picker" role="group" aria-label="Тип соединения">
+<button class="connection-choice" id="connectionVP" data-connection="half" type="button" aria-pressed="true"><svg aria-hidden="true" viewBox="0 0 54 58"><path d="M10 9h34v7H31v26h13v7H10v-7h13V16H10z" fill="#e4ebef" stroke="#536a7c" stroke-width="1.4"/><path d="M7 4h40v4H7zM7 50h40v4H7zM12 17h9v4h-9zM33 17h9v4h-9zM12 37h9v4h-9zM33 37h9v4h-9z" fill="#b5dad6" stroke="#4b8d8e"/><path d="M17 1v23M37 1v23M17 34v23M37 34v23" stroke="#52697b" stroke-width="2"/></svg><span class="choice-copy"><strong>ВП · Верхний пояс</strong><small>Накладки по поясам</small></span><span class="choice-formula">Nf = N′ / b</span><span class="choice-check" aria-hidden="true">✓</span></button>
+<button class="connection-choice" id="connectionNP" data-connection="section" type="button" aria-pressed="false"><svg aria-hidden="true" viewBox="0 0 54 58"><path d="M10 9h34v7H31v26h13v7H10v-7h13V16H10z" fill="#e4ebef" stroke="#536a7c" stroke-width="1.4"/><path d="M7 4h40v4H7zM7 50h40v4H7zM12 17h9v4h-9zM33 17h9v4h-9zM12 37h9v4h-9zM33 37h9v4h-9z" fill="#b5dad6" stroke="#4b8d8e"/><path d="M18 23h4v13h-4zM32 23h4v13h-4z" fill="#f2d6aa" stroke="#ad7d3e"/><path d="M17 1v23M37 1v23M17 34v23M37 34v23M15 29h24" stroke="#52697b" stroke-width="2"/></svg><span class="choice-copy"><strong>НП · Нижний пояс</strong><small>Накладки по поясам и стенке</small></span><span class="choice-formula">Nf = N′ · AB / AI</span><span class="choice-check" aria-hidden="true">✓</span></button>
+</div>
+<div class="node-panel"><div class="node-chooser"><label for="nodePreset">Исходный набор параметров</label><div class="node-controls"><button id="nodePrev" type="button" aria-label="Предыдущий узел">‹</button><select id="nodePreset"><option value="custom">Произвольные исходные данные</option></select><button id="nodeNext" type="button" aria-label="Следующий узел">›</button></div><div id="refPreset" class="reference"></div></div><div><div class="mode-label" id="modelHelp">Учёт поперечной силы QY</div><div class="mode-picker" role="radiogroup" aria-labelledby="modelHelp"><label><input type="radio" name="model" id="model_pdf" value="pdf">Без QY · исходная PDF</label><label><input type="radio" name="model" id="model_qy" value="qy">С учётом QY</label></div></div></div>
+</section>
+<div class="grid-main">
+<section class="panel" id="inputPanel"><div class="input-head"><h2>Исходные данные</h2><span class="section-index">ПАРАМЕТРЫ</span></div><div class="tabs" role="tablist" aria-label="Исходные данные"><button class="tab" id="tab_loads" role="tab" aria-selected="true" aria-controls="panel_loads" data-tab="loads" type="button">Нагрузки<span class="tab-errors" aria-hidden="true"></span></button><button class="tab" id="tab_geometry" role="tab" aria-selected="false" aria-controls="panel_geometry" tabindex="-1" data-tab="geometry" type="button">Геометрия<span class="tab-errors" aria-hidden="true"></span></button><button class="tab" id="tab_bolts" role="tab" aria-selected="false" aria-controls="panel_bolts" tabindex="-1" data-tab="bolts" type="button">Болты<span class="tab-errors" aria-hidden="true"></span></button></div>
+<div class="tab-panel" id="panel_loads" role="tabpanel" aria-labelledby="tab_loads"><div class="fields" id="loadsFields"></div><p class="subnote">Силы — целые кН. Моменты — кН·м. Пересчёт при вводе.</p></div>
+<div class="tab-panel" id="panel_geometry" role="tabpanel" aria-labelledby="tab_geometry" hidden><div class="method-summary" id="methodSummary"></div><div class="fields" id="geometryFields"></div><div class="fields extra-geometry" id="sectionFields" hidden></div><p class="subnote">Размеры — мм. Количество рядов — целое.</p></div>
+<div class="tab-panel" id="panel_bolts" role="tabpanel" aria-labelledby="tab_bolts" hidden><div class="selectors"><div><label for="boltSize">Диаметр болта</label><select id="boltSize"></select></div><div><label for="boltGrade">Класс прочности</label><select id="boltGrade"><option value="8.8">8.8</option><option value="10.9">10.9</option><option value="12.9">12.9</option><option value="custom">Своё Rbt</option></select></div></div><div class="chips" id="boltChips" role="group" aria-label="Быстрый выбор болта"></div><div class="fields" id="boltsFields"></div><label class="checkline"><input id="autoArea" type="checkbox">A из справочника диаметра</label><label class="checkline"><input id="autoRbt" type="checkbox">Rbt из справочника класса</label><p class="subnote" id="boltValueSource"></p></div>
+</section>
+<div class="stack">
+<aside class="panel results" id="results" aria-label="Результат расчёта"><div class="panel-head"><h2>Результат расчёта</h2><div class="result-tags"><span class="tag type" id="connectionTag">ВП</span><span class="tag" id="variantTag"></span></div></div><div class="resultbox"><div class="model-name" id="resultTitle"></div><div class="result-duo"><div><div class="result-label" id="forceLabel">Усилие на болт NB</div><div class="result-value"><span id="rNB">—</span> <small>кН</small></div></div><div><div class="result-label">Несущая способность NBR</div><div class="result-value"><span id="rNBR">—</span> <small>кН</small></div></div><div class="use-block"><div class="result-label">Использование</div><div class="use-value" id="rUse">—</div><div class="resultbar" role="progressbar" aria-label="Использование несущей способности" aria-valuemin="0" aria-valuemax="100" id="utilMeter"><div id="utilBar"></div></div></div></div><div class="status" id="resultStatus" role="status" aria-live="polite">Расчёт…</div><div class="status-rounding" id="roundingNote" hidden></div></div><div class="quick-metrics"><div><span>Коэффициент запаса</span><strong id="rReserve">—</strong></div><div><span>Запас по усилию</span><strong id="rDiff">—</strong></div><div><span>Болтов поясов b · nV · nG</span><strong id="rBoltCount">—</strong></div></div><details class="component-details"><summary>Составляющие и детали расчёта</summary><div class="component-grid" id="componentBars"></div><div class="metric"><span>NB по исходной формуле PDF</span><strong id="rNBold">—</strong></div><div id="refLine" class="ref-line"></div><div class="summary-foot" id="modelNote"></div></details><div id="warningsBlock" class="warnings" hidden></div></aside>
+<section class="panel" id="schemePanel"><div class="panel-head"><div class="scheme-title"><span class="section-index" id="schemeType">ВП</span><h2 id="schemeHeading">Схема соединения ВП</h2></div><button class="scheme-expand" id="expandScheme" type="button" aria-expanded="false" aria-controls="drawingWrap">↗ Увеличить</button></div><div class="scheme-body"><div class="scheme-legend"><span class="legend-item"><i class="legend-swatch"></i>Двутавр</span><span class="legend-item"><i class="legend-swatch belt"></i>Накладки поясов</span><span class="legend-item" id="webLegend" hidden><i class="legend-swatch web"></i>Накладки стенки</span></div><div class="drawing-wrap" id="drawingWrap"><div class="scheme-hint">Схему можно прокручивать ↔</div><svg id="boltDrawing" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="schemeTitle schemeDesc"></svg></div><div class="distribution" id="distribution"><div><div class="distribution-label">Продольная сила на один пояс</div><div class="distribution-equation" id="distributionFormula"></div></div><div class="distribution-value"><span id="rNf">—</span><small>кН</small></div><div class="distribution-meta" id="sectionAreas" hidden></div></div><p class="drawing-caption" id="drawingCaption"></p><p class="drawing-caption">Нажмите размер на схеме, чтобы изменить его.</p></div></section>
+</div></div>
+<details class="panel formula-panel" id="formulaDetails"><summary>Формулы расчёта<span class="formula-type" id="formulaTypeLabel">ВП</span></summary><div class="panel-body"><div class="formula active" id="distributionDetail"></div><div class="formula" id="sectionFormula" hidden>AB = bB·tB; AI = 2·AB + hS·tS</div><div class="formula" id="nb1Formula"></div><div class="formula">NB2 = (MY·1000 + QZ·e)·max(a1,a2)/((a1²+a2²)·b1·b·nV)</div><div class="formula">NB3 = QZ/(b1·b·nV·nG); NB4 = QY/(b1·b·nV·nG)</div><div class="formula" id="activeFormula"></div><div class="formula">NBR = A·Rbt·μ·γc·γ1/(γh·1000); условие: NB &lt; NBR</div><p class="subnote">Знаки нагрузок сохраняются. Другие предельные состояния не рассчитываются.</p></div></details>
+<footer class="footer"><span>v3.5 · схемы ВП и НП · автономный HTML</span><span id="draftStatus" role="status"></span></footer>
+</main>
+<a class="live-strip" href="#results" aria-label="Перейти к результату"><span><small>NB / NBR, кН</small><br><strong id="mobileForce">—</strong></span><span id="mobileUse">—</span></a><button class="scheme-close" id="closeScheme" type="button">Закрыть · Esc</button><div class="toast" id="toast" role="status" hidden></div><section id="printSheet" aria-label="Печатная версия"></section><noscript><p style="padding:20px">Для расчёта откройте HTML в браузере с включённым JavaScript.</p></noscript>
+
+<script id="embeddedState" type="application/json">{"format":"bolt-connection-calculator","version":3,"values":null}</script>
+<script>
+'use strict';
+// The factory datasets and formula order are retained from v3.2.
+const AREAS={12:84.3,14:115,16:157,18:192,20:245,22:303,24:353,27:459,30:561,33:694,36:817};
+const RBT={'8.8':451,'10.9':728,'12.9':854};
+const DEFAULTS={N:731,QY:15,QZ:27,MY:70,MZ:66,e:470,tB:20,hS:610,b:2,b1:2,nV:7,nG:4,a1:120,a2:250,bB:450,tS:20,A:353,RBt:728,mu:0.4,gammaH:1.12,gammaC:0.9,gamma1:0.9,boltSize:'24',boltGrade:'10.9',method:'half',node:1,model:'qy',autoArea:true,autoRbt:true};
+const FACTORY=[{"QY":15,"QZ":27,"MY":70,"MZ":66,"e":470,"tB":20,"hS":610,"b":2,"b1":2,"nV":7,"nG":4,"N":731,"gamma1":0.9,"node":1,"name":"1ВП1-1","pages":"1–2","reference":17.999975082412874,"method":"half","boltSize":"24","boltGrade":"10.9"},{"QY":50,"QZ":40,"MY":65,"MZ":105,"e":470,"tB":25,"hS":600,"b":2,"b1":2,"nV":7,"nG":4,"N":3400,"gamma1":0.9,"node":2,"name":"1ВП2-1","pages":"3–4","reference":43.088327619297075,"method":"half","boltSize":"24","boltGrade":"10.9"},{"QY":50,"QZ":47,"MY":77,"MZ":105,"e":438,"tB":30,"hS":590,"b":2,"b1":2,"nV":8,"nG":4,"N":7610,"gamma1":0.9,"node":3,"name":"1НП2-4","pages":"5–6","reference":53.93349161871858,"method":"section","boltSize":"24","boltGrade":"10.9","bB":450,"tS":20},{"QY":90,"QZ":40,"MY":78,"MZ":240,"e":438,"tB":20,"hS":610,"b":2,"b1":2,"nV":8,"nG":4,"N":3950,"gamma1":0.9,"node":4,"name":"1НП1-1","pages":"7–8","reference":37.595785301914084,"method":"section","boltSize":"24","boltGrade":"10.9","bB":450,"tS":12},{"QY":65,"QZ":30,"MY":88,"MZ":153,"e":440,"tB":40,"hS":570,"b":2,"b1":2,"nV":8,"nG":4,"N":9830,"gamma1":1,"node":5,"name":"1НП3-4","pages":"9–10","reference":69.21932025154835,"method":"section","boltSize":"24","boltGrade":"10.9","bB":450,"tS":25},{"QY":50,"QZ":47,"MY":77,"MZ":105,"e":440,"tB":30,"hS":590,"b":2,"b1":2,"nV":8,"nG":4,"N":7610,"gamma1":0.9,"node":6,"name":"1НП2-1","pages":"11–12","reference":53.943041137357376,"method":"section","boltSize":"24","boltGrade":"10.9","bB":450,"tS":20},{"QY":50,"QZ":40,"MY":65,"MZ":105,"e":470,"tB":25,"hS":600,"b":2,"b1":2,"nV":7,"nG":4,"N":3400,"gamma1":0.9,"node":7,"name":"1ВП2-2","pages":"13–14","reference":43.088327619297075,"method":"half","boltSize":"24","boltGrade":"10.9"},{"QY":46,"QZ":38,"MY":110,"MZ":110,"e":470,"tB":30,"hS":590,"b":2,"b1":2,"nV":7,"nG":4,"N":5480,"gamma1":1,"node":8,"name":"1ВП3-1","pages":"15–16","reference":66.9429804575125,"method":"half","boltSize":"24","boltGrade":"10.9"},{"QY":46,"QZ":38,"MY":110,"MZ":110,"e":405,"tB":30,"hS":590,"b":2,"b1":2,"nV":7,"nG":4,"N":5480,"gamma1":1,"node":9,"name":"1ВП3-1","pages":"17–18","reference":66.6562016934287,"method":"half","boltSize":"24","boltGrade":"10.9"},{"QY":46,"QZ":38,"MY":110,"MZ":110,"e":405,"tB":30,"hS":590,"b":2,"b1":2,"nV":7,"nG":4,"N":5480,"gamma1":1,"node":10,"name":"1ВП3-4","pages":"19–20","reference":66.6562016934287,"method":"half","boltSize":"24","boltGrade":"10.9"},{"QY":37,"QZ":28,"MY":73,"MZ":107,"e":405,"tB":30,"hS":590,"b":2,"b1":2,"nV":7,"nG":4,"N":5335,"gamma1":1,"node":11,"name":"2ВП3-3","pages":"21–22","reference":60.508644270106096,"method":"half","boltSize":"24","boltGrade":"10.9"},{"QY":37,"QZ":28,"MY":73,"MZ":107,"e":405,"tB":30,"hS":590,"b":2,"b1":2,"nV":7,"nG":4,"N":5335,"gamma1":1,"node":12,"name":"2ВП3-2","pages":"23–24","reference":60.508644270106096,"method":"half","boltSize":"24","boltGrade":"10.9"},{"QY":37,"QZ":28,"MY":73,"MZ":107,"e":405,"tB":30,"hS":590,"b":2,"b1":2,"nV":7,"nG":4,"N":5335,"gamma1":1,"node":13,"name":"2ВП3-2","pages":"25–26","reference":60.508644270106096,"method":"half","boltSize":"24","boltGrade":"10.9"},{"QY":60,"QZ":30,"MY":47,"MZ":150,"e":405,"tB":25,"hS":600,"b":2,"b1":2,"nV":7,"nG":4,"N":2970,"gamma1":0.9,"node":14,"name":"2ВП2-1","pages":"27–28","reference":37.67220900584685,"method":"half","boltSize":"24","boltGrade":"10.9"},{"QY":35,"QZ":30,"MY":60,"MZ":95,"e":438,"tB":30,"hS":590,"b":2,"b1":2,"nV":8,"nG":4,"N":6530,"gamma1":0.9,"node":15,"name":"2НП2-2","pages":"29–30","reference":45.32583338557187,"method":"section","boltSize":"24","boltGrade":"10.9","bB":450,"tS":20},{"QY":65,"QZ":20,"MY":62,"MZ":156,"e":438,"tB":40,"hS":570,"b":2,"b1":2,"nV":8,"nG":4,"N":9400,"gamma1":1,"node":16,"name":"2НП3-2","pages":"31–32","reference":63.79675239639148,"method":"section","boltSize":"24","boltGrade":"10.9","bB":450,"tS":25},{"QY":35,"QZ":30,"MY":60,"MZ":95,"e":438,"tB":30,"hS":590,"b":2,"b1":2,"nV":8,"nG":4,"N":6530,"gamma1":0.9,"node":17,"name":"2НП2-3","pages":"33–34","reference":45.32583338557187,"method":"section","boltSize":"24","boltGrade":"10.9","bB":450,"tS":20},{"QY":86,"QZ":33,"MY":50,"MZ":280,"e":438,"tB":20,"hS":610,"b":2,"b1":2,"nV":8,"nG":4,"N":3055,"gamma1":0.9,"node":18,"name":"2НП1-2","pages":"35–36","reference":30.460804196053417,"method":"section","boltSize":"24","boltGrade":"10.9","bB":450,"tS":12},{"QY":60,"QZ":27,"MY":53,"MZ":200,"e":405,"tB":20,"hS":610,"b":2,"b1":2,"nV":7,"nG":4,"N":462,"gamma1":0.9,"node":19,"name":"2ВП1-1","pages":"37–38","reference":17.218875635097888,"method":"half","boltSize":"24","boltGrade":"10.9"},{"QY":60,"QZ":30,"MY":47,"MZ":150,"e":405,"tB":25,"hS":600,"b":2,"b1":2,"nV":7,"nG":4,"N":2970,"gamma1":0.9,"node":20,"name":"2ВП2-2","pages":"39–40","reference":37.67220900584685,"method":"half","boltSize":"24","boltGrade":"10.9"}];
+const FIELD_GROUPS={
+ loads:[['N','N′ · Продольная сила','кН',-15000,15000,1],['QY','QY · Поперечная сила','кН',-1000,1000,1],['QZ','QZ · Поперечная сила','кН',-1000,1000,1],['MY','MY · Момент вокруг Y','кН·м',-1500,1500,1],['MZ','MZ · Момент вокруг Z','кН·м',-1500,1500,1],['e','e · Эксцентриситет','мм',0,1500,1]],
+ geometry:[['tB','tB · Толщина полки','мм',4,100,1],['hS','hS · Высота стенки','мм',100,2500,10],['b','b · Работающие полки','шт.',1,4,1],['b1','b1 · Плоскости трения','шт.',1,6,1],['nV','nV · Ряды вдоль оси X','шт.',1,20,1],['nG','nG · Ряды поперёк полки','шт.',1,12,1],['a1','a₁ · Расчётное плечо 1','мм',10,1000,5],['a2','a₂ · Расчётное плечо 2','мм',10,1000,5]],
+ section:[['bB','bB · Ширина полки','мм',120,900,5],['tS','tS · Толщина стенки','мм',4,60,1]],
+ bolts:[['A','A · Площадь нетто','мм²',25,1800,0.1],['RBt','Rbt · Сопротивление','Н/мм²',100,1200,1],['mu','μ · Коэффициент трения','',0.05,0.8,0.01],['gammaH','γh · Коэффициент надёжности','',0.8,2.5,0.01],['gammaC','γc · Условия работы','',0.1,1.5,0.01],['gamma1','γ₁ · Наличие прокладок','',0.1,1.5,0.01]]
+};
+const MOMENT_TO_KN_MM=1000;
+const numberKeys=Object.values(FIELD_GROUPS).flat().map(f=>f[0]);
+const integerLoads=new Set(['N','QY','QZ']);
+const countKeys=new Set(['b','b1','nV','nG']);
+const stateKeys=[...numberKeys,'boltSize','boltGrade','method','node','model','autoArea','autoRbt'];
+const allowed=new Set(stateKeys);
+const bounds={b:10,b1:10,nV:200,nG:50};
+let state,history=[],activeEdit=null,ready=false,draftTimer,pendingDraft=null,draftKey='',storageAvailable=true;
+const el=id=>document.getElementById(id);
+const number=(v,places=2)=>Number.isFinite(v)?v.toLocaleString('ru-RU',{minimumFractionDigits:places,maximumFractionDigits:places}):'—';
+const inputNumber=v=>Number.isFinite(v)?String(v).replace('.',','):'';
+function parseNumber(v){
+ if(typeof v==='number')return v;
+ if(typeof v!=='string')return NaN;
+ const s=v.trim().replace(/[ \u00a0\u202f]/g,'');
+ return /^[+-]?(?:\d+(?:[.,]\d*)?|[.,]\d+)(?:e[+-]?\d+)?$/i.test(s)?Number(s.replace(',','.')):NaN;
+}
+function normalize(input,strict=false){
+ if(!input||typeof input!=='object'||Array.isArray(input))throw Error('Неверный объект параметров');
+ const out={};
+ for(const [k,v] of Object.entries(input)){
+  if(!allowed.has(k))continue;
+  if(numberKeys.includes(k)){
+   const n=parseNumber(v);if(!Number.isFinite(n))throw Error(k+': требуется конечное число');
+   if(Math.abs(n)>1e9)throw Error(k+': слишком большое значение');
+   out[k]=integerLoads.has(k)?Math.round(n):n;
+  }else if(k==='boltSize'){
+   if(!Object.prototype.hasOwnProperty.call(AREAS,String(v)))throw Error('Неизвестный диаметр болта');out[k]=String(v);
+  }else if(k==='boltGrade'){
+   if(!Object.prototype.hasOwnProperty.call(RBT,String(v))&&v!=='custom')throw Error('Неизвестный класс болта');out[k]=String(v);
+  }else if(k==='method'||k==='model'){
+   if(!(k==='method'?['half','section']:['pdf','qy']).includes(v))throw Error('Неизвестная модель или метод распределения');out[k]=v;
+  }else if(k==='node'){
+   const n=parseNumber(v);if(!Number.isInteger(n)||n<0||n>FACTORY.length)throw Error('Неверный номер узла');out[k]=n;
+  }else{if(typeof v!=='boolean')throw Error('Неверный режим справочника');out[k]=v;}
+ }
+ if(strict){
+  const required=[...numberKeys.filter(k=>input.method==='section'||!['bB','tS'].includes(k)),'method','boltSize','boltGrade'];
+  const missing=required.filter(k=>!Object.prototype.hasOwnProperty.call(out,k));
+  if(missing.length)throw Error('В файле отсутствуют параметры: '+missing.join(', '));
+ }
+ return out;
+}
+function factoryState(id){return normalize({...DEFAULTS,...(FACTORY[id-1]||{}),node:id||0});}
+function canonical(s){return JSON.stringify(Object.fromEntries(stateKeys.map(k=>[k,s[k]])));}
+function getEditedFor(s){
+ if(!s.node)return true;const ref=factoryState(s.node);
+ return [...numberKeys,'method','boltSize','boltGrade','autoArea','autoRbt'].some(k=>{
+  if(s.method!=='section'&&['bB','tS'].includes(k))return false;return s[k]!==ref[k];
+ });
+}
+function validateState(s){
+ const errs=[],warns=[];
+ for(const k of numberKeys){
+  if(['bB','tS'].includes(k)&&s.method!=='section')continue;
+  const v=s[k];
+  if(typeof v!=='number'||!Number.isFinite(v)){errs.push(k+': требуется число');continue;}
+  if(Math.abs(v)>1e9){errs.push(k+': слишком большое значение');continue;}
+  if(integerLoads.has(k)&&!Number.isInteger(v))errs.push(k+': при завершении ввода округляется до целого кН');
+  if(countKeys.has(k)&&!Number.isInteger(v))errs.push(k+': требуется целое количество');
+  if(!['N','QY','QZ','MY','MZ','e'].includes(k)&&v<=0)errs.push(k+': значение должно быть больше нуля');
+  if(k==='e'&&v<0)errs.push('e: значение не может быть отрицательным');
+  if(bounds[k]&&v>bounds[k])errs.push(k+': технический предел '+bounds[k]);
+ }
+ if(!['half','section'].includes(s.method))errs.push('Неизвестный метод распределения');
+ if(!['pdf','qy'].includes(s.model))errs.push('Неизвестная расчётная модель');
+ if(s.nG!==4||s.b!==2||s.b1!==2||![7,8].includes(s.nV)||s.a1!==120||s.a2!==250)warns.push('Сетка отличается от 20 исходных узлов. Применимость формулы NB2 к этой геометрии не подтверждена.');
+ if(s.node&&s.method!==FACTORY[s.node-1]?.method)warns.push('Метод распределения N′ изменён относительно исходного узла.');
+ if(s.boltSize!=='24'||s.boltGrade!=='10.9'||s.A!==353||s.RBt!==728)warns.push('В PDF подтверждён М24 10.9: A = 353 мм², Rbt = 728 Н/мм². Для выбранного болта проверьте справочные значения и применимость.');
+ if(s.autoArea===false||s.autoRbt===false)warns.push('A и/или Rbt заданы вручную.');
+ if(s.nG===4&&s.a1===s.a2)warns.push('a₁ = a₂: ряды болтов совпадают на схеме.');
+ return{errs,warns};
+}
+function calc(s){
+ const issues=validateState(s);if(issues.errs.length)return{valid:false,reason:issues.errs[0],issues};
+ const x=Object.fromEntries(numberKeys.map(k=>[k,Number(s[k])]));
+ const AB=s.method==='section'?x.bB*x.tB:NaN,AI=s.method==='section'?2*AB+x.hS*x.tS:NaN;
+ const part=s.method==='section'?x.N*AB/AI:x.N/x.b;
+ const NB1=(part+x.MZ*MOMENT_TO_KN_MM/(x.hS+x.tB))/(x.b1*x.nV*x.nG);
+ const NB2=((x.MY*MOMENT_TO_KN_MM+x.QZ*x.e)*Math.max(x.a1,x.a2))/((x.a1*x.a1+x.a2*x.a2)*x.b1*x.b*x.nV);
+ const NB3=x.QZ/(x.b1*x.b*x.nV*x.nG),NB4=x.QY/(x.b1*x.b*x.nV*x.nG);
+ const NBold=Math.hypot(NB1+NB2,NB3),NBqy=Math.hypot(NB1+NB2,NB3,NB4);
+ const NB=s.model==='pdf'?NBold:NBqy;
+ const NBR=x.A*x.RBt*x.mu*x.gammaC*x.gamma1/x.gammaH/1000;
+ const use=100*NB/NBR,reserve=NB===0?Infinity:NBR/NB;
+ if(![NB1,NB2,NB3,NB4,NB,NBqy,NBold,NBR,use].every(Number.isFinite)||NBR<=0||(NB>0&&!Number.isFinite(reserve)))return{valid:false,reason:'Выход за числовой диапазон расчёта',issues};
+ return{valid:true,NB1,NB2,NB3,NB4,NBold,NBqy,NB,NBR,AB,AI,issues,use,reserve,passed:NB<NBR};
+}
+function parseImportedJSON(obj){
+ if(!obj||typeof obj!=='object'||Array.isArray(obj))throw Error('Некорректный JSON');
+ if(obj.format!==undefined&&!['bolt-connection-calculator','bolt-connection-calculator-v2'].includes(obj.format))throw Error('Неизвестный формат файла');
+ if(obj.format==='bolt-connection-calculator'&&obj.version!==3)throw Error('Неподдерживаемая версия '+obj.version);
+ if(obj.format===undefined&&obj.version!==undefined&&![2,3].includes(obj.version))throw Error('Неподдерживаемая версия '+obj.version);
+ if(obj.format==='bolt-connection-calculator-v2'&&obj.version!==undefined&&obj.version!==2)throw Error('Неподдерживаемая версия '+obj.version);
+ const values=normalize(obj.values===undefined?obj:obj.values,true);
+ const proposed={...DEFAULTS,...values};delete proposed.schemeScale;
+ if(values.autoArea===undefined)proposed.autoArea=proposed.A===AREAS[proposed.boltSize];
+ if(values.autoRbt===undefined)proposed.autoRbt=proposed.boltGrade!=='custom'&&proposed.RBt===RBT[proposed.boltGrade];
+ if(proposed.autoArea&&proposed.A!==AREAS[proposed.boltSize])throw Error('A не соответствует выбранному справочному диаметру');
+ if(proposed.autoRbt&&(proposed.boltGrade==='custom'||proposed.RBt!==RBT[proposed.boltGrade]))throw Error('Rbt не соответствует выбранному справочному классу');
+ const r=calc(proposed);if(!r.valid)throw Error(r.reason);
+ return proposed;
+}
+function remember(key=null){
+ if(key&&activeEdit===key)return;
+ history.push({...state});if(history.length>40)history.shift();activeEdit=key;el('undoBtn').disabled=false;
+}
+function changeState(proposed,message){remember();state=proposed;updateAll();if(message)toast(message);}
+function finishEdit(k,inp,range,min,max,step){
+ if(integerLoads.has(k)&&Number.isFinite(state[k])&&!Number.isInteger(state[k])){
+  state[k]=Math.round(state[k]);inp.value=inputNumber(state[k]);setSlider(range,state[k],min,max,step,k);updateResults();toast(k+' округлено до '+inputNumber(state[k])+' кН');
+ }else if(Number.isFinite(state[k]))inp.value=inputNumber(state[k]);
+ setSlider(range,state[k],min,max,step,k);activeEdit=null;
+}
+function markManual(k){
+ if(k==='A')state.autoArea=false;
+ if(k==='RBt'){state.autoRbt=false;state.boltGrade='custom';el('boltGrade').value='custom';}
+}
+function setSlider(range,v,min,max,step,key){
+ const note=el('range_'+key);if(note)note.textContent='';
+ range.disabled=!Number.isFinite(v)||(countKeys.has(key)&&!Number.isInteger(v))||(integerLoads.has(key)&&!Number.isInteger(v));
+ if(range.disabled)return;
+ const decimal=(String(v).split('.')[1]||'').split('e')[0].length;
+ const fine=String(v).includes('e-')?Math.min(step,10**(-Number(String(v).split('e-')[1]))):Math.min(step,10**(-decimal));
+ const aligned=Math.abs((v-min)/step-Math.round((v-min)/step))<1e-7;
+ const actualStep=aligned?step:fine;
+ // Extend both controls without letting a range silently clamp a valid manual value.
+ range.min=String(Math.min(min,v));range.max=String(Math.max(max,v));
+ range.step=actualStep>=1e-8?String(actualStep):'any';range.value=String(v);
+ if(Number(range.value)!==v){range.step='any';range.value=String(v);}
+ range.setAttribute('aria-valuetext',inputNumber(v));
+ range.title=(v<min||v>max)?'Диапазон расширен: '+inputNumber(Number(range.min))+' … '+inputNumber(Number(range.max)):'Шаг '+inputNumber(actualStep);
+ range.dataset.expanded=String(v<min||v>max);
+ if(note&&(v<min||v>max))note.textContent='Диапазон ползунка расширен: '+inputNumber(Number(range.min))+' … '+inputNumber(Number(range.max));
+}
+function renderFields(){
+ for(const [group,fields] of Object.entries(FIELD_GROUPS))for(const [k,label,unit,min,max,step] of fields){
+  const div=document.createElement('div');div.className='field';
+  div.innerHTML=`<div class="field-label"><label for="field_${k}">${label.replace(/^([^·]+) · /,'<span class="field-symbol">$1</span> · ')}</label><span class="unit">${unit}</span></div><div class="field-inputs"><input class="range" type="range" aria-label="Ползунок: ${label}" min="${min}" max="${max}" step="${step}" aria-describedby="error_${k}"><input class="val" id="field_${k}" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="error_${k}"></div><div class="field-error" id="error_${k}"></div><div class="range-note" id="range_${k}"></div>`;
+  el(group+'Fields').append(div);
+  const range=div.querySelector('.range'),inp=div.querySelector('.val');
+  range.addEventListener('input',()=>{remember(k);state[k]=Number(range.value);range.setAttribute('aria-valuetext',inputNumber(state[k]));inp.value=inputNumber(state[k]);markManual(k);updateResults();});
+  range.addEventListener('change',()=>{activeEdit=null;});
+  inp.addEventListener('input',()=>{remember(k);state[k]=parseNumber(inp.value);setSlider(range,state[k],min,max,step,k);markManual(k);updateResults();});
+  inp.addEventListener('blur',()=>finishEdit(k,inp,range,min,max,step));
+  inp.addEventListener('change',()=>finishEdit(k,inp,range,min,max,step));
+  inp.addEventListener('keydown',ev=>{if(ev.key==='Enter'){finishEdit(k,inp,range,min,max,step);inp.blur();}});
+ }
+}
+function selectNode(id){
+ const proposed=factoryState(id);proposed.model=state.model;changeState(proposed);
+}
+function initSelects(){
+ for(const k of Object.keys(AREAS)){const o=document.createElement('option');o.value=k;o.textContent='М'+k;el('boltSize').append(o);}
+ for(const p of FACTORY){const o=document.createElement('option');o.value=String(p.node);o.textContent=`${p.node} · ${p.name} · ${p.method==='section'?'НП':'ВП'}`;el('nodePreset').append(o);}
+ for(const k of [16,20,22,24,27,30,36]){
+  const b=document.createElement('button');b.type='button';b.className='chip';b.dataset.size=String(k);b.textContent='М'+k;
+  b.addEventListener('click',()=>{if(state.boltSize===String(k))return;remember();state.boltSize=String(k);if(state.autoArea)state.A=AREAS[k];updateAll();});el('boltChips').append(b);
+ }
+ el('boltSize').addEventListener('change',()=>{remember();state.boltSize=el('boltSize').value;if(state.autoArea)state.A=AREAS[state.boltSize];updateAll();});
+ el('boltGrade').addEventListener('change',()=>{remember();state.boltGrade=el('boltGrade').value;if(state.boltGrade==='custom')state.autoRbt=false;else if(state.autoRbt)state.RBt=RBT[state.boltGrade];updateAll();});
+ el('nodePreset').addEventListener('change',()=>{if(el('nodePreset').value==='custom')changeState({...state,node:0});else selectNode(Number(el('nodePreset').value));});
+ el('nodePrev').addEventListener('click',()=>selectNode(Math.max(1,state.node-1)));
+ el('nodeNext').addEventListener('click',()=>selectNode(Math.min(FACTORY.length,state.node+1)));
+ document.querySelectorAll('.connection-choice').forEach(button=>button.addEventListener('click',()=>{const method=button.dataset.connection;if(state.method!==method)changeState({...state,method},(method==='section'?'НП':'ВП')+': схема и формула изменены. Введённые значения сохранены.');}));
+ document.querySelectorAll('input[name="model"]').forEach(r=>r.addEventListener('change',()=>changeState({...state,model:r.value})));
+ el('autoArea').addEventListener('change',()=>{remember();state.autoArea=el('autoArea').checked;if(state.autoArea)state.A=AREAS[state.boltSize];updateAll();});
+ el('autoRbt').addEventListener('change',()=>{remember();state.autoRbt=el('autoRbt').checked;if(state.autoRbt){if(state.boltGrade==='custom')state.boltGrade='10.9';state.RBt=RBT[state.boltGrade];}updateAll();});
+}
+function renderControls(){
+ for(const fields of Object.values(FIELD_GROUPS))for(const [k,,,min,max,step] of fields){const inp=el('field_'+k);inp.value=inputNumber(state[k]);setSlider(inp.previousElementSibling,state[k],min,max,step,k);}
+ for(const k of ['boltSize','boltGrade'])el(k).value=state[k];
+ el('nodePreset').value=state.node?String(state.node):'custom';el('sectionFields').hidden=state.method!=='section';
+ document.querySelectorAll('input[name="model"]').forEach(r=>{r.checked=r.value===state.model;r.parentElement.classList.toggle('selected',r.checked);});
+ el('nodePrev').disabled=!state.node||state.node<=1;el('nodeNext').disabled=!state.node||state.node>=FACTORY.length;
+ el('resetBtn').disabled=!state.node;el('undoBtn').disabled=!history.length;
+ document.querySelectorAll('.chip').forEach(b=>{b.classList.toggle('current',b.dataset.size===state.boltSize);b.setAttribute('aria-pressed',String(b.dataset.size===state.boltSize));});
+}
+function updateAll(){renderControls();updateResults();}
+function updateResults(){
+ const r=calc(state),pdf=state.model==='pdf',p=FACTORY[state.node-1];
+ const put=(id,v,suffix='')=>el(id).textContent=Number.isFinite(v)?number(v)+suffix:'—';
+ put('rNB',r.NB);put('rNBR',r.NBR);put('rUse',r.use,' %');put('rDiff',r.NBR-r.NB,' кН');put('rNBold',r.NBold,' кН');
+ el('rReserve').textContent=r.valid?(r.reserve===Infinity?'∞':number(r.reserve)):'—';
+ el('rBoltCount').textContent=r.valid?String(state.b*state.nV*state.nG):'—';
+ el('resultTitle').textContent=(state.method==='section'?'НП · Nf = N′·AB/AI':'ВП · Nf = N′/b')+' · '+(pdf?'без QY':'с учётом QY');
+ el('forceLabel').textContent='Усилие на болт NB';
+ el('activeFormula').textContent=pdf?'NB = √((NB1+NB2)² + NB3²)':'NB = √((NB1+NB2)² + NB3² + NB4²)';
+ const status=el('resultStatus');status.className='status'+(!r.valid?' invalid':r.passed?'':' fail');
+ status.textContent=r.valid?(r.passed?'✓ Условие NB < NBR выполняется':'✕ Условие NB < NBR не выполняется'):'Проверьте ввод: '+r.reason;
+ el('utilBar').style.width=r.valid?Math.min(100,Math.max(0,r.use))+'%':'0%';el('utilBar').style.background=r.valid?(r.passed?(r.use>=90?'#e7be6b':'#4dc497'):'#f194a0'):'#e7be6b';
+ el('utilMeter').setAttribute('aria-valuenow',r.valid?String(Math.min(100,r.use)):'0');
+ el('utilMeter').setAttribute('aria-valuetext',r.valid?number(r.use)+' %':'Ошибка ввода');
+ const rounding=r.valid&&number(r.NB)===number(r.NBR);el('roundingNote').hidden=!rounding;el('roundingNote').textContent='Значения совпадают после округления. Условие проверено без округления.';
+ el('variantTag').textContent='М'+state.boltSize+' · '+(state.boltGrade==='custom'?'своё Rbt':state.boltGrade);
+ el('autoArea').checked=state.autoArea;el('autoRbt').checked=state.autoRbt;
+ el('boltValueSource').textContent=(state.autoArea?'A — справочник':'A — вручную')+'; '+(state.autoRbt?'Rbt — справочник':'Rbt — вручную')+'.';
+ el('modelNote').textContent=pdf?'QY не входит в выбранную формулу.':'NB4 от QY — дополнение к заводской формуле.';
+ el('refPreset').textContent=p?'PDF, стр. '+p.pages+' · '+(getEditedFor(state)?'параметры изменены':'исходные параметры'):'Произвольные исходные данные';
+ if(p&&state.method!==p.method)el('refPreset').textContent='На основе '+p.name+' · тип изменён на '+(state.method==='section'?'НП':'ВП')+' · значения сохранены';
+ el('refPreset').classList.toggle('edited',!!p&&getEditedFor(state));
+ el('refLine').textContent=p?(getEditedFor(state)?'Эталон узла '+p.node+': NB PDF = '+number(p.reference)+' кН.':r.valid&&Math.abs(r.NBold-p.reference)<1e-9?'NB PDF совпадает с эталоном исходного узла.':''):'Эталон PDF для этого набора не задан.';
+ const wrn=el('warningsBlock');wrn.replaceChildren();wrn.classList.toggle('errors',!r.valid);
+ const messages=r.valid?r.issues.warns:(r.issues.errs.length?r.issues.errs:[r.reason]);
+ for(const msg of messages){const key=msg.split(':')[0],isField=!r.valid&&numberKeys.includes(key),line=document.createElement(isField?'button':'p');line.textContent=msg;if(isField){line.type='button';line.className='error-link';line.addEventListener('click',()=>focusField(key));}wrn.append(line);}wrn.hidden=!messages.length;
+ for(const name of ['loads','geometry','bolts']){const keys=(name==='geometry'?[...FIELD_GROUPS.geometry,...(state.method==='section'?FIELD_GROUPS.section:[])]:FIELD_GROUPS[name]).map(f=>f[0]);const count=keys.filter(k=>r.issues.errs.some(m=>m.startsWith(k+':'))).length;el('tab_'+name).querySelector('.tab-errors').textContent=count?String(count):'';el('tab_'+name).setAttribute('aria-label',({loads:'Нагрузки',geometry:'Геометрия',bolts:'Болты и коэффициенты'})[name]+(count?' · ошибок: '+count:''));}
+ for(const k of numberKeys){const msg=r.issues.errs.find(m=>m.startsWith(k+':'));el('error_'+k).textContent=msg||'';el('field_'+k).classList.toggle('error',!!msg);el('field_'+k).setAttribute('aria-invalid',String(!!msg));}
+ for(const id of ['saveHTML','saveJSON','printBtn'])el(id).disabled=!r.valid;
+ el('mobileForce').textContent=r.valid?number(r.NB)+' / '+number(r.NBR):'Ошибка ввода';
+ el('mobileUse').textContent=r.valid?(r.passed?'✓ ':'✕ ')+number(r.use)+' %':'Исправьте параметры';
+ renderConnection(r);renderBars(r);drawBolts(r);
+ if(ready)scheduleDraft(r);
+}
+function renderConnection(result){
+ const np=state.method==='section',type=np?'НП':'ВП',formula=np?'N′ · AB / AI':'N′ / b';
+ document.querySelectorAll('.connection-choice').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.connection===state.method)));
+ for(const id of ['connectionTag','schemeType']){el(id).textContent=type;el(id).classList.toggle('np',np);}
+ el('schemeHeading').textContent='Схема соединения '+type;
+ el('formulaTypeLabel').textContent=type+' · '+(np?'с накладками стенки':'накладки по поясам');
+ el('webLegend').hidden=!np;
+ el('sectionFormula').hidden=!np;
+ el('distribution').classList.toggle('np',np);
+ el('distributionFormula').textContent='Nf = '+formula;
+ el('distributionDetail').textContent=type+': Nf = '+formula;
+ el('distributionDetail').classList.toggle('np',np);
+ el('nb1Formula').textContent='NB1 = ('+(np?'N′·AB/AI':'N′/b')+' + MZ·1000/(hS+tB))/(b1·nV·nG)';
+ const summary=el('methodSummary');summary.replaceChildren();summary.append(dom('strong','',type+' · Nf = '+formula),dom('small','',np?'Усилие распределяется по площадям полок и стенки.':'Продольная сила распределяется между поясами.'));
+ const nf=result.valid?(np?state.N*result.AB/result.AI:state.N/state.b):NaN;
+ el('rNf').textContent=number(nf);
+ el('sectionAreas').hidden=!np;
+ el('sectionAreas').textContent=result.valid&&np?'AB = '+number(result.AB)+' мм² · AI = '+number(result.AI)+' мм²':'';
+}
+
+function renderBars(r){
+ const box=el('componentBars');box.replaceChildren();if(!r.valid)return;
+ const rows=[['NB1','N′ и MZ',r.NB1],['NB2','MY + QZ·e',r.NB2],['NB3','QZ',r.NB3],['NB4',state.model==='pdf'?'QY · не входит в итог':'QY',r.NB4]];
+ const max=Math.max(.001,...rows.map(row=>Math.abs(row[2])));
+ for(const [key,caption,v] of rows){
+  const row=document.createElement('div');row.className='comp-row'+(key==='NB4'&&state.model==='pdf'?' inactive':'');
+  const name=document.createElement('strong'),track=document.createElement('div'),bar=document.createElement('div'),val=document.createElement('span'),cap=document.createElement('div');
+  name.textContent=key;track.className='comp-track';bar.className='comp-bar';bar.style.width=Math.abs(v)/max*100+'%';track.append(bar);
+  val.className='comp-value';val.textContent=number(v)+' кН';cap.className='comp-caption';cap.textContent=caption;row.append(name,track,val,cap);box.append(row);
+ }
+}
+const SVGNS='http://www.w3.org/2000/svg';
+function sv(parent,tag,attrs={},text){const n=document.createElementNS(SVGNS,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,String(v));if(text!==undefined)n.textContent=text;parent.append(n);return n;}
+function drawBolts(result){
+ const svg=el('boltDrawing'),np=state.method==='section',type=np?'НП':'ВП';svg.replaceChildren();svg.dataset.connection=np?'np':'vp';
+ sv(svg,'title',{id:'schemeTitle'},`Соединение ${type}: вид сбоку, поперечное сечение и план пояса`);
+ sv(svg,'desc',{id:'schemeDesc'},np?'Двутавр с накладками на обоих поясах и дополнительными накладками по обе стороны стенки. Болты стенки показаны условно и отдельно не рассчитываются.':'Двутавр с накладками на поясах; болтовых накладок на стенке нет.');
+ let caption='Схема без масштаба. Размеры накладок и продольные шаги — условные.';
+ if(np)caption+=' Болты стенки показаны условно; их отдельная проверка не входит в расчёт.';
+ if(state.nG!==4)caption+=' Расположение рядов при nG ≠ 4 условное.';
+ if(state.nV>20||state.nG>12)caption+=` Показано ${Math.min(state.nV,20)} × ${Math.min(state.nG,12)} из ${state.nV} × ${state.nG} болтов.`;
+ if(state.b>2)caption+=' На видах показаны два пояса.';
+ el('drawingCaption').textContent=caption;
+ if(!result.valid){sv(svg,'text',{x:35,y:65,'font-size':17,fill:'#b43e4c'},'Для построения схемы исправьте исходные данные');return;}
+ const C={ink:'#344f60',muted:'#728793',steel:'#e7edf1',steelLine:'#617b8b',belt:'#cee6e2',beltLine:'#4d8c8e',web:'#f4dfbd',webLine:'#b18245',force:'#377f93'};
+ const line=(x1,y1,x2,y2,a={})=>sv(svg,'line',{x1,y1,x2,y2,stroke:C.ink,'stroke-width':1.4,...a});
+ const rect=(x,y,width,height,a={})=>sv(svg,'rect',{x,y,width,height,fill:C.steel,stroke:C.steelLine,'stroke-width':1.5,...a});
+ const text=(x,y,t,a={})=>sv(svg,'text',{x,y,'font-family':'Arial,sans-serif','font-size':13,fill:C.ink,...a},t);
+ const axis=(x1,y1,x2,y2)=>line(x1,y1,x2,y2,{stroke:'#90a4ae','stroke-width':.8,'stroke-dasharray':'11 4 2 4'});
+ const defs=sv(svg,'defs');
+ for(const [id,color,size] of [['forceHead',C.force,8],['dimHead','#718b9a',5]]){const m=sv(defs,'marker',{id,viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:size,markerHeight:size,orient:'auto-start-reverse',markerUnits:'userSpaceOnUse'});sv(m,'path',{d:'M0 1L9 5L0 9Z',fill:color});}
+ const hatch=sv(defs,'pattern',{id:'plateHatch',width:7,height:7,patternUnits:'userSpaceOnUse',patternTransform:'rotate(45)'});sv(hatch,'rect',{width:7,height:7,fill:C.steel});sv(hatch,'line',{x1:0,y1:0,x2:0,y2:7,stroke:'#c0cdd5','stroke-width':1});
+ const grid=sv(defs,'pattern',{id:'drawingGrid',width:25,height:25,patternUnits:'userSpaceOnUse'});sv(grid,'path',{d:'M25 0H0V25',fill:'none',stroke:'#edf1f4','stroke-width':.65});
+ rect(0,0,1000,600,{fill:'#fcfdfd',stroke:'none'});rect(0,0,1000,600,{fill:'url(#drawingGrid)',stroke:'none'});
+ function hit(key,x,y,w,h,label){const g=sv(svg,'g',{class:'dim-control',role:'button',tabindex:0,'data-field':key,'aria-label':label||'Изменить '+key});sv(g,'title',{},label||'Изменить '+key);sv(g,'rect',{x,y,width:w,height:h,rx:4,class:'scheme-dimension-hit'});g.addEventListener('click',()=>focusField(key));g.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();focusField(key);}});}
+ function dimH(x1,x2,y,label,fromY){line(x1,fromY,x1,y+6,{stroke:'#b0bec7','stroke-width':.8});line(x2,fromY,x2,y+6,{stroke:'#b0bec7','stroke-width':.8});if(Math.abs(x2-x1)>2)line(x1,y,x2,y,{stroke:'#718b9a','stroke-width':1,'marker-start':'url(#dimHead)','marker-end':'url(#dimHead)'});text((x1+x2)/2,y-8,label,{'text-anchor':'middle','font-size':13,fill:'#587587'});}
+ function dimV(x,y1,y2,label,fromX){line(fromX,y1,x+6,y1,{stroke:'#b0bec7','stroke-width':.8});line(fromX,y2,x+6,y2,{stroke:'#b0bec7','stroke-width':.8});line(x,y1,x,y2,{stroke:'#718b9a','stroke-width':1,'marker-start':'url(#dimHead)','marker-end':'url(#dimHead)'});text(x+15,(y1+y2)/2,label,{'font-size':13,'text-anchor':'middle',fill:'#587587',transform:`rotate(-90 ${x+15} ${(y1+y2)/2})`});}
+ function force(x,y,dx,dy,name,value,inactive=false){const sign=value<0?-1:1,tx=x+dx*sign,ty=y+dy*sign;line(x,y,tx,ty,{stroke:inactive?'#94a8b5':C.force,'stroke-width':2,'marker-end':'url(#forceHead)',...(inactive?{'stroke-dasharray':'5 4'}:{})});text(dx?Math.max(x,tx)+8:x+10,dy?Math.min(y,ty)-9:y-9,name,{'font-size':14,'font-weight':'bold',fill:inactive?'#94a8b5':C.force});}
+ function moment(x,y,name,value){const reversed=value<0;sv(svg,'path',{d:reversed?`M${x+18} ${y-14} A23 23 0 1 0 ${x+20} ${y+12}`:`M${x+20} ${y+12} A23 23 0 1 0 ${x+18} ${y-14}`,fill:'none',stroke:C.force,'stroke-width':1.7,'marker-end':'url(#forceHead)'});text(x-10,y+5,name,{'font-size':13,'font-weight':600,fill:C.force});}
+ function head(x,y,r,kind='plan'){const g=sv(svg,'g',{['data-'+kind+'-bolt']:'true'});sv(g,'circle',{cx:x,cy:y,r:r+2,fill:'#fff',stroke:'#7b919e','stroke-width':.8});sv(g,'polygon',{points:Array.from({length:6},(_,i)=>`${x+r*Math.cos(i*Math.PI/3)},${y+r*Math.sin(i*Math.PI/3)}`).join(' '),fill:'#dce6eb',stroke:C.ink,'stroke-width':1.15});sv(g,'path',{d:`M${x-r-3} ${y}h${2*r+6}M${x} ${y-r-3}v${2*r+6}`,stroke:'#7e939f','stroke-width':.7});}
+ function bolt(x,y,t,cover,horizontal=false){const g=sv(svg,'g',horizontal?{transform:`translate(${x} ${y}) rotate(90)`}:{transform:`translate(${x} ${y})`});const d=Math.min(7,Math.max(3.5,Number(state.boltSize)*.22));sv(g,'rect',{x:-d/2,y:-cover-4,width:d,height:t+2*cover+8,fill:'#7a919f',stroke:C.ink,'stroke-width':.8});for(const [yy,hh] of [[-cover-8,4],[t+cover+4,5]])sv(g,'rect',{x:-d,y:yy,width:2*d,height:hh,rx:1,fill:'#b7c9d2',stroke:C.ink,'stroke-width':.9});sv(g,'line',{x1:0,y1:-cover-13,x2:0,y2:t+cover+15,stroke:'#90a4ae','stroke-width':.6,'stroke-dasharray':'3 2'});}
+ const coverAttrs={fill:C.belt,stroke:C.beltLine,'stroke-width':1.4},webAttrs={fill:C.web,stroke:C.webLine,'stroke-width':1.4,'data-web-plate':'true'};
+ text(26,29,'ВИД СБОКУ',{'font-size':14,'font-weight':700,'letter-spacing':1});text(715,29,'ПОПЕРЕЧНОЕ СЕЧЕНИЕ',{'font-size':14,'font-weight':700,'letter-spacing':.6});
+ const top=90,t=Math.max(7,Math.min(17,state.tB*.4)),gap=Math.max(100,Math.min(150,state.hS*.225)),bottom=top+t+gap,cySide=(top+bottom+t)/2;
+ const cols=Math.min(state.nV,20),rows=Math.min(state.nG,12),cx=255,px=90,pw=330,xs=Array.from({length:cols},(_,i)=>cols===1?cx:110+290*i/(cols-1));
+ const ePx=Math.min(320,state.e*.62),loadX=cx+ePx,end=Math.max(495,loadX),cover=6;
+ rect(45,top+t,end-45,gap,{fill:'#edf2f5',stroke:'#b3c1ca','stroke-width':1});rect(45,top,end-45,t,{fill:'url(#plateHatch)'});rect(45,bottom,end-45,t,{fill:'url(#plateHatch)'});
+ rect(px,top-cover,pw,cover,coverAttrs);if(state.b1>=2)rect(px,top+t,pw,cover,coverAttrs);
+ if(state.b>=2){rect(px,bottom+t,pw,cover,coverAttrs);if(state.b1>=2)rect(px,bottom-cover,pw,cover,coverAttrs);}
+ if(np){const webTop=top+t+23,webH=gap-46;rect(px,webTop,pw,webH,webAttrs);for(let i=0;i<5;i++)for(const y of [webTop+17,webTop+webH-17])head(px+30+i*(pw-60)/4,y,4.3,'web');text(px+pw/2,webTop+webH/2+4,'Накладка стенки',{'text-anchor':'middle','font-size':12,fill:'#986e35'});}
+ for(const x of xs){bolt(x,top,t,cover);if(state.b>=2)bolt(x,bottom,t,cover);}
+ axis(30,cySide,end+12,cySide);axis(loadX,61,loadX,bottom+t+24);
+ line(45,top+2,45,bottom+t-2,{stroke:'#fcfdfd','stroke-width':6});sv(svg,'path',{d:`M45 ${top+2}V${cySide-12}l-6 5 12 7 -12 7 6 5V${bottom+t-2}`,fill:'none',stroke:C.steelLine,'stroke-width':1.2});
+ force(loadX,cySide,80,0,'N′',state.N);force(loadX,cySide,0,-80,'QY',state.QY,state.model==='pdf');moment(638,256,'MZ',state.MZ);
+ text(45,295,np?'НП · накладки по поясам и по стенке':'ВП · накладки только по поясам',{'font-size':13,fill:np?'#9b7037':'#478183'});
+ // Cross-section: the two web cover plates appear only in the НП detail.
+ const left=739,right=889,center=814,webT=Math.max(7,Math.min(15,state.tS*.5)),wl=center-webT/2,wr=center+webT/2;
+ sv(svg,'path',{d:`M${left} ${top}H${right}v${t}H${wr}V${bottom}H${right}v${t}H${left}v-${t}H${wl}V${top+t}H${left}Z`,fill:'url(#plateHatch)',stroke:C.steelLine,'stroke-width':1.5});
+ rect(left-4,top-cover,right-left+8,cover,coverAttrs);if(state.b1>=2){rect(left+6,top+t,wl-left-12,cover,coverAttrs);rect(wr+6,top+t,right-wr-12,cover,coverAttrs);}
+ if(state.b>=2){rect(left-4,bottom+t,right-left+8,cover,coverAttrs);if(state.b1>=2){rect(left+6,bottom-cover,wl-left-12,cover,coverAttrs);rect(wr+6,bottom-cover,right-wr-12,cover,coverAttrs);}}
+ for(const x of [left+25,right-25]){bolt(x,top,t,cover);if(state.b>=2)bolt(x,bottom,t,cover);}
+ if(np){const y=top+t+24,h=gap-48;rect(wl-7,y,6,h,webAttrs);rect(wr+1,y,6,h,webAttrs);for(const yy of [y+19,y+h-19])bolt(wr,yy,webT,7,true);}
+ axis(center,70,center,bottom+t+20);axis(left-15,cySide,right+17,cySide);
+ dimV(923,top+t,bottom,'hS = '+inputNumber(state.hS),right+2);hit('hS',917,top+t-3,30,gap+6,'Изменить высоту стенки hS');
+ if(np){dimH(left,right,58,'bB = '+inputNumber(state.bB),top-8);hit('bB',left-4,37,right-left+8,26,'Изменить ширину полки bB');text(724,294,'tS = '+inputNumber(state.tS),{'font-size':13,fill:'#587587'});hit('tS',714,275,96,26,'Изменить толщину стенки tS');}
+ text(np?831:770,294,'tB = '+inputNumber(state.tB)+' мм',{'font-size':13,fill:'#587587'});hit('tB',np?823:761,275,112,26,'Изменить толщину полки tB');
+ line(24,321,976,321,{stroke:'#dbe4ea','stroke-width':1});
+ text(26,352,'ПЛАН ОДНОГО ПОЯСА',{'font-size':14,'font-weight':700,'letter-spacing':1});
+ text(26,375,`nV = ${state.nV}   ·   nG = ${state.nG}   ·   М${state.boltSize}`,{'font-size':13,fill:C.muted});
+ const cy=469,maxArm=Math.max(state.a1,state.a2),scale=54/maxArm,a1=state.a1*scale,a2=state.a2*scale;
+ rect(45,399,end-45,140,{fill:'#edf2f5'});
+ if(state.nG>=2){rect(px,404,pw,57,coverAttrs);rect(px,477,pw,57,coverAttrs);}else rect(px,404,pw,130,coverAttrs);
+ line(45,465,end,465,{stroke:'#a6bac4','stroke-width':.9,'stroke-dasharray':'6 4'});line(45,473,end,473,{stroke:'#a6bac4','stroke-width':.9,'stroke-dasharray':'6 4'});
+ axis(30,cy,end+12,cy);axis(cx,390,cx,545);axis(loadX,388,loadX,548);
+ const offsets=state.nG===4?[-state.a2,-state.a1,state.a1,state.a2]:Array.from({length:rows},(_,i)=>rows===1?0:-maxArm+2*maxArm*i/(rows-1));
+ const radius=Math.max(2,Math.min(5,Number(state.boltSize)*.20,cols>12?3.3:5,rows>6?3:5));for(const x of xs)for(const a of offsets)head(x,cy+a*scale,radius);
+ sv(svg,'circle',{cx,cy,r:3,fill:C.ink});text(cx-14,cy-9,'C',{'font-size':12,'font-style':'italic'});
+ force(loadX,cy,80,0,'N′',state.N);force(loadX,cy,0,-66,'QZ',state.QZ);moment(638,543,'MY',state.MY);
+ dimH(cx,loadX,572,'e = '+inputNumber(state.e)+' мм',cy+14);hit('e',cx-8,549,Math.max(95,loadX-cx+16),31,'Изменить эксцентриситет e');
+ if(state.nG===4){dimV(678,cy,cy+a1,'a₁ = '+inputNumber(state.a1),end+7);dimV(723,cy,cy+a2,'a₂ = '+inputNumber(state.a2),end+7);hit('a1',672,cy-10,30,a1+20,'Изменить плечо a₁');hit('a2',717,cy-10,30,a2+20,'Изменить плечо a₂');}
+ text(784,408,'БОЛТЫ ПОЯСОВ',{'font-size':12,'font-weight':700,fill:C.muted,'letter-spacing':.7});text(784,440,String(state.nV*state.nG),{'font-size':29,'font-weight':700});text(784,462,'на один пояс',{'font-size':13,fill:C.muted});text(784,496,'C — центр группы',{'font-size':13,fill:C.muted});text(784,517,'Размеры — мм',{'font-size':13,fill:C.muted});
+ if(np){rect(784,544,169,30,{fill:'#fff7e9',stroke:'#ecd8b5',rx:5});text(796,564,'+ накладки стенки',{'font-size':13,fill:'#9b7037'});}
+ hit('nV',20,357,71,25,'Изменить число продольных рядов nV');hit('nG',96,357,68,25,'Изменить число поперечных рядов nG');hit('boltSize',172,357,63,25,'Изменить диаметр болта');
+}
+
+
+function toast(message){el('toast').textContent=message;el('toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>el('toast').hidden=true,3800);}
+function activateTab(name,focus=false){
+ document.querySelectorAll('.tab').forEach(b=>{const active=b.dataset.tab===name;b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;if(active&&focus)b.focus();});
+ for(const nameOfPanel of ['loads','geometry','bolts'])el('panel_'+nameOfPanel).hidden=nameOfPanel!==name;
+}
+function focusField(key){
+ if(el('drawingWrap').classList.contains('expanded'))toggleScheme(false);
+ const tab=key==='boltSize'||FIELD_GROUPS.bolts.some(f=>f[0]===key)?'bolts':FIELD_GROUPS.loads.some(f=>f[0]===key)?'loads':'geometry';
+ activateTab(tab);const input=el(key==='boltSize'?'boltSize':'field_'+key);input.scrollIntoView({block:'center',behavior:'auto'});input.focus({preventScroll:true});if(input.select)input.select();
+}
+function toggleScheme(open){
+ el('drawingWrap').classList.toggle('expanded',open);el('closeScheme').classList.toggle('visible',open);el('expandScheme').setAttribute('aria-expanded',String(open));
+ document.body.style.overflow=open?'hidden':'';
+ const wrap=el('drawingWrap');if(open){wrap.setAttribute('role','dialog');wrap.setAttribute('aria-modal','true');wrap.setAttribute('aria-label','Схема расположения болтов');}else{for(const k of ['role','aria-modal','aria-label'])wrap.removeAttribute(k);}
+ if(open){wrap.scrollTop=0;wrap.scrollLeft=0;el('closeScheme').focus();}else el('expandScheme').focus();
+}
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return(h>>>0).toString(36);}
+function setupDraft(){
+ draftKey='bolt-calculator:v3:'+hash(canonical(state));
+ try{
+  const raw=localStorage.getItem(draftKey);
+  if(raw){const obj=JSON.parse(raw);const proposed=parseImportedJSON(obj);if(canonical(proposed)!==canonical(state)){
+   pendingDraft=proposed;el('draftBanner').hidden=false;el('draftMessage').textContent='В этом браузере есть черновик'+(obj.savedAt?' от '+new Date(obj.savedAt).toLocaleString('ru-RU'):'')+'.';
+  }}
+  el('draftStatus').textContent=pendingDraft?'Найден локальный черновик':'Черновик сохраняется в этом браузере';
+ }catch(e){storageAvailable=false;el('draftStatus').textContent='Для сохранения используйте HTML';}
+}
+function scheduleDraft(r){
+ clearTimeout(draftTimer);if(!storageAvailable||pendingDraft)return;
+ if(!r.valid){el('draftStatus').textContent='Черновик не обновлён: ошибка ввода';return;}
+ draftTimer=setTimeout(()=>{try{
+  localStorage.setItem(draftKey,JSON.stringify({format:'bolt-connection-calculator',version:3,savedAt:new Date().toISOString(),values:normalize(state,true)}));
+  el('draftStatus').textContent='Черновик сохранён в этом браузере';
+ }catch(e){storageAvailable=false;el('draftStatus').textContent='Для сохранения используйте HTML';}},250);
+}
+function envelope(){const r=calc(state);if(!r.valid)throw Error(r.reason);return{format:'bolt-connection-calculator',version:3,appVersion:'3.5',savedAt:new Date().toISOString(),values:normalize(state,true)};}
+function download(name,content,type){
+ const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+}
+function stamp(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function serializeHTML(){
+ const doc=new DOMParser().parseFromString(HTML_TEMPLATE,'text/html');
+ doc.getElementById('embeddedState').textContent=JSON.stringify(envelope()).replace(/</g,'\\u003c');
+ return '<!DOCTYPE html>\n'+doc.documentElement.outerHTML;
+}
+function saveHTML(){try{download('bolt_connection_calculator_v3_5_node_'+(state.node||'custom')+'_'+stamp()+'.html',serializeHTML(),'text/html;charset=utf-8');toast('HTML с текущими параметрами готов к сохранению');}catch(e){toast(e.message);}}
+function saveJSON(){try{download('bolt_connection_v3_'+stamp()+'.json',JSON.stringify(envelope(),null,2),'application/json;charset=utf-8');toast('JSON с текущими параметрами готов к сохранению');}catch(e){toast(e.message);}}
+function dom(tag,className,text){const n=document.createElement(tag);if(className)n.className=className;if(text!==undefined)n.textContent=text;return n;}
+function preparePrint(){
+ const box=el('printSheet');box.replaceChildren();const r=calc(state),p=FACTORY[state.node-1];
+ const header=dom('div','print-top'),name=dom('div'),meta=dom('div','print-date');
+ name.append(dom('h1','','Расчёт болтов поясов'),dom('p','',p?'Узел '+p.node+' · '+p.name+' · PDF, стр. '+p.pages:'Произвольные исходные данные'));
+ meta.append(dom('div','','Калькулятор v3.5'),dom('div','',new Date().toLocaleString('ru-RU')));header.append(name,meta);box.append(header);
+ if(!r.valid){box.append(dom('div','print-error','Расчёт не выполнен. '+r.reason));return;}
+ box.append(dom('p','',(state.method==='section'?'Схема НП · ':'Схема ВП · ')+(state.model==='pdf'?'Модель PDF, без QY':'Модель с QY')+' · Nf = '+(state.method==='half'?'N′/b':'N′·AB/AI')+' · М'+state.boltSize+' '+(state.boltGrade==='custom'?'(своё Rbt)':state.boltGrade)+(getEditedFor(state)?' · параметры изменены':'')));
+ const main=dom('div','print-result');
+ for(const [label,v,unit] of [['NB',r.NB,'кН'],['NBR',r.NBR,'кН'],['Использование',r.use,'%']]){const vbox=dom('div');vbox.append(dom('div','',label),dom('strong','',number(v)+' '+unit));main.append(vbox);}
+ main.append(dom('div','',r.passed?'NB < NBR — выполняется':'NB < NBR — не выполняется'));box.append(main);
+ const cols=dom('div','print-columns');
+ for(const [title,fields] of [['Нагрузки',FIELD_GROUPS.loads],['Геометрия',[...FIELD_GROUPS.geometry,...(state.method==='section'?FIELD_GROUPS.section:[])]],['Болт и коэффициенты',FIELD_GROUPS.bolts]]){
+  const col=dom('section'),table=dom('table','print-table');col.append(dom('h2','',title));
+  for(const [k,label,unit] of fields){const row=dom('tr');row.append(dom('td','',label.split(' · ')[0]),dom('td','',inputNumber(state[k])+(unit?' '+unit:'')));table.append(row);}
+  col.append(table);cols.append(col);
+ }box.append(cols);
+ const detail=dom('div','print-components');for(const k of ['NB1','NB2','NB3','NB4'])detail.append(dom('span','',k+' = '+number(r[k])+' кН'+(k==='NB4'&&state.model==='pdf'?' (не учтено)':'')));box.append(detail);
+ box.append(dom('p','','Запас: NBR/NB = '+(r.reserve===Infinity?'∞':number(r.reserve))+'; NBR−NB = '+number(r.NBR-r.NB)+' кН. Болтов: '+state.b*state.nV*state.nG+'.'));
+ const formulas=dom('div','print-formulas');
+ for(const id of ['formulaDetails'])for(const f of el(id).querySelectorAll('.formula'))if(!f.hidden)formulas.append(dom('div','',f.textContent));box.append(formulas);
+ if(number(r.NB)===number(r.NBR))box.append(dom('p','print-warning','Значения совпадают после округления. Условие проверено без округления.'));
+ const scheme=dom('div','print-scheme'),drawing=el('boltDrawing').cloneNode(true);drawing.removeAttribute('id');drawing.querySelectorAll('.dim-control').forEach(n=>n.remove());
+ for(const n of [drawing,...drawing.querySelectorAll('*')]){
+  if(n.id)n.id='print_'+n.id;
+  for(const a of Array.from(n.attributes)){
+   if(a.name==='aria-labelledby')n.setAttribute(a.name,a.value.split(' ').map(v=>'print_'+v).join(' '));
+   else if(a.value.includes('url(#'))n.setAttribute(a.name,a.value.replace(/url\(#/g,'url(#print_'));
+  }
+ }scheme.append(drawing);box.append(scheme);
+ box.append(dom('p','print-warning',el('drawingCaption').textContent));
+ const notes=[...r.issues.warns];if(state.model==='qy')notes.unshift('NB4 от QY — дополнение к заводской формуле.');
+ if(notes.length)box.append(dom('p','print-warning',notes.join(' ')));
+ box.append(dom('p','print-source','Источник: 2026-10-13_Проверка узлов от завода.pdf. Проверка по принятой расчётной модели; другие предельные состояния не включены.'));
+}
+// Capture the untouched, static document so exported controls are rebuilt once.
+const HTML_TEMPLATE=document.documentElement.outerHTML;
+function boot(){
+ state=factoryState(1);
+ try{const obj=JSON.parse(el('embeddedState').textContent);if(obj.values!==null)state=parseImportedJSON(obj);}catch(e){el('startupAlert').hidden=false;el('startupAlert').textContent='Сохранённые параметры не прочитаны: '+e.message+'. Загружены исходные параметры узла 1.';}
+ renderFields();initSelects();updateAll();if(window.matchMedia('(max-width:780px)').matches)document.querySelector('.component-details').open=false;setupDraft();ready=true;
+}
+el('expandScheme').addEventListener('click',()=>toggleScheme(true));
+ el('closeScheme').addEventListener('click',()=>toggleScheme(false));
+ document.addEventListener('keydown',ev=>{if(!el('drawingWrap').classList.contains('expanded'))return;
+  if(ev.key==='Escape'){ev.preventDefault();toggleScheme(false);}
+  else if(ev.key==='Tab'){const targets=[el('closeScheme'),...el('drawingWrap').querySelectorAll('[tabindex="0"]')],i=targets.indexOf(document.activeElement),next=ev.shiftKey?(i<=0?targets.length-1:i-1):(i+1)%targets.length;ev.preventDefault();targets[next].focus();}
+ });
+ el('saveHTML').addEventListener('click',saveHTML);el('saveJSON').addEventListener('click',saveJSON);
+el('loadJSON').addEventListener('click',()=>el('jsonFile').click());
+el('printBtn').addEventListener('click',()=>{if(!calc(state).valid)return;preparePrint();window.print();});
+window.addEventListener('beforeprint',preparePrint);
+el('resetBtn').addEventListener('click',()=>{if(!state.node)return;const id=state.node;if(!getEditedFor(state)){toast('Параметры узла '+id+' уже исходные');return;}const restored=factoryState(id);restored.model=state.model;changeState(restored,'Восстановлен узел '+id+'. Изменение можно отменить.');});
+el('undoBtn').addEventListener('click',()=>{if(!history.length)return;state=history.pop();activeEdit=null;updateAll();toast('Изменение отменено');});
+el('restoreDraft').addEventListener('click',()=>{if(!pendingDraft)return;const draft=pendingDraft;pendingDraft=null;el('draftBanner').hidden=true;changeState(draft,'Черновик восстановлен');});
+el('dismissDraft').addEventListener('click',()=>{try{localStorage.removeItem(draftKey);}catch(e){}pendingDraft=null;el('draftBanner').hidden=true;el('draftStatus').textContent='Черновик удалён';});
+el('jsonFile').addEventListener('change',async ev=>{
+ const file=ev.target.files?.[0];if(!file)return;
+ try{if(file.size>300000)throw Error('Размер JSON превышает 300 КБ');const proposed=parseImportedJSON(JSON.parse(await file.text()));changeState(proposed,'Параметры загружены');}
+ catch(e){toast('JSON не загружен: '+e.message);}finally{ev.target.value='';}
+});
+document.querySelectorAll('.tab').forEach((b,index,buttons)=>{
+ b.addEventListener('click',()=>activateTab(b.dataset.tab));
+ b.addEventListener('keydown',ev=>{let n;if(ev.key==='ArrowRight')n=(index+1)%buttons.length;else if(ev.key==='ArrowLeft')n=(index+buttons.length-1)%buttons.length;else if(ev.key==='Home')n=0;else if(ev.key==='End')n=buttons.length-1;if(n!==undefined){ev.preventDefault();activateTab(buttons[n].dataset.tab,true);}});
+});
+boot();
+
+</script>
+</body></html>
